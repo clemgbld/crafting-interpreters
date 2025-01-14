@@ -31,3 +31,12 @@ void delete_tail(struct Node *head) {
   free(head->value);
   free(head);
 };
+
+struct Node *find_by_index(struct Node *head, int index) {
+  for (int i = 0; head != NULL; i++, head = head->next) {
+    if (i == index) {
+      return head;
+    };
+  }
+  return NULL;
+}

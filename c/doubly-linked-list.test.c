@@ -141,6 +141,47 @@ static MunitResult delete_tests(const MunitParameter params[], void *fixture) {
   return MUNIT_OK;
 }
 
+static MunitResult find_tests(const MunitParameter params[], void *fixture) {
+  char *a_string = malloc_string("a string");
+  char *second_string = malloc_string("second string");
+  char *third_string = malloc_string("third string");
+  struct Node *doubly_linked_list = malloc(sizeof(struct Node));
+  doubly_linked_list->next = NULL;
+  doubly_linked_list->previous = NULL;
+  doubly_linked_list->value = a_string;
+  struct Node *next_node = malloc(sizeof(struct Node));
+  struct Node *next_node2 = malloc(sizeof(struct Node));
+  next_node2->previous = next_node;
+  next_node2->next = NULL;
+  next_node2->value = third_string;
+  next_node->value = second_string;
+  next_node->next = next_node2;
+  next_node->previous = doubly_linked_list;
+  doubly_linked_list->next = next_node;
+  // cannot find the index is looking for
+  struct Node *not_found = find_by_index(doubly_linked_list, 5);
+  munit_assert_null(not_found);
+
+  // should find the first item
+  struct Node *p1 = find_by_index(doubly_linked_list, 0);
+  munit_assert_ptr_equal(p1, doubly_linked_list);
+
+  struct Node *p2 = find_by_index(doubly_linked_list, 1);
+  munit_assert_ptr_equal(p2, next_node);
+
+  struct Node *p3 = find_by_index(doubly_linked_list, 2);
+  munit_assert_ptr_equal(p3, next_node2);
+
+  free(a_string);
+  free(second_string);
+  free(third_string);
+  free(doubly_linked_list);
+  free(next_node);
+  free(next_node2);
+
+  return MUNIT_OK;
+}
+
 MunitTest tests[] = {{
                          "/insert test",         /* name */
                          insert_tests,           /* test */
@@ -152,6 +193,14 @@ MunitTest tests[] = {{
                      {
                          "/delete test",         /* name */
                          delete_tests,           /* test */
+                         NULL,                   /* setup */
+                         NULL,                   /* tear_down */
+                         MUNIT_TEST_OPTION_NONE, /* options */
+                         NULL                    /* parameters */
+                     },
+                     {
+                         "/find test",           /* name */
+                         find_tests,             /* test */
                          NULL,                   /* setup */
                          NULL,                   /* tear_down */
                          MUNIT_TEST_OPTION_NONE, /* options */
