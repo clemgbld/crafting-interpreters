@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import static com.craftinginterpreters.lox.TokenType.*;
 
 public class Scanner {
     private final String source;
+    private final BiConsumer<Integer,String> error;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
     private  int current = 0;
@@ -35,8 +37,10 @@ public class Scanner {
         keywords.put("while",  WHILE);
     }
 
-    public Scanner(String source) {
+    public Scanner(String source, BiConsumer<Integer,String> error) {
         this.source = source;
+        this.error = error;
+
     }
 
     List<Token> scanTokens(){
@@ -88,7 +92,7 @@ public class Scanner {
                 }else if(isAlpha(c)){
                    identifier();
                 }else{
-                    Lox.error(line, "Unexpected character.");
+                    error.accept(line, "Unexpected character.");
                 }
                 break;
         }
@@ -139,7 +143,7 @@ public class Scanner {
         }
 
         if(isAtEnd()){
-            Lox.error(line, "Unterminated string");
+            error.accept(line, "Unterminated string");
             return;
         }
         advance();

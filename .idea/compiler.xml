@@ -11,6 +11,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="lox" target="17" />
+      <module name="same" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
