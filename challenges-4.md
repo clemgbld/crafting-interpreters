@@ -15,3 +15,7 @@ and with the c preprocessor #define X 5 will work and #define X5 won't because i
 
 i might not want to discard them if i would use comments in my programing language to specify some metadata for example to suppress a warning like you can do with es-lint. 
 
+## 4 Add support to Lox’s scanner for C-style /* ... */ block comments. Make sure to handle newlines in them. Consider allowing them to nest. Is adding support for nesting more work than you expected? Why?
+
+It was not that hard to add support for nesting with the help of recursion but it could cause a stack overflow if the comments are nested too deeply and the error reporting was also tricky
+

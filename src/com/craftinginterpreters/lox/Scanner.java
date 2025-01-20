@@ -74,6 +74,8 @@ public class Scanner {
                     while (peek() != '\n' && !isAtEnd()){
                         advance();
                     }
+                } else if(match('*')){
+                    skipMultiLineComments();
                 }else{
                     addToken(SLASH);
                 }
@@ -95,6 +97,30 @@ public class Scanner {
                     error.accept(line, "Unexpected character.");
                 }
                 break;
+        }
+    }
+
+    private void skipMultiLineComments() {
+        while (!isAtEnd() && peek() != '*' && peekNext() != '/'){
+            if(peek() == '\n'){
+                line++;
+            }
+            if(match('/') && peek() == '*'){
+                advance();
+                skipMultiLineComments();
+                if(isAtEnd()){
+                    error.accept(line,"Unexpected multi line comment never closed");
+                    return;
+                }
+            }
+           advance();
+        }
+        if(isAtEnd()){
+            error.accept(line,"Unexpected multi line comment never closed");
+
+        }else {
+            advance();
+            advance();
         }
     }
 
