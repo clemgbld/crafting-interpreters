@@ -5,9 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Expr.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/tool/GenerateAst.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Expr.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Expr.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/tool/GenerateAst.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/tool/GenerateAst.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Expr$Binary.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Expr$Grouping.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Expr$Literal.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Expr$Unary.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Expr.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/tool/GenerateAst.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/tool/GenerateAst.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,6 +54,7 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
@@ -112,7 +119,9 @@
       <workItem from="1737102839699" duration="1503000" />
       <workItem from="1737104357241" duration="1169000" />
       <workItem from="1737201855874" duration="5830000" />
-      <workItem from="1737444460653" duration="2864000" />
+      <workItem from="1737444460653" duration="3204000" />
+      <workItem from="1737474902268" duration="274000" />
+      <workItem from="1737476005752" duration="2470000" />
     </task>
     <servers />
   </component>
