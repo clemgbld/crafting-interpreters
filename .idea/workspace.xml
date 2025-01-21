@@ -5,11 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Lox.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Scanner.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Token.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/TokenType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Expr.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/tool/GenerateAst.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +55,21 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Application.Lox">
+  <component name="RunManager" selected="Application.GenerateAst">
+    <configuration name="GenerateAst" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.tool.GenerateAst" />
+      <module name="crafting-interpreters" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/com/craftinginterpreters/lox" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.craftinginterpreters.tool.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Lox" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.Lox" />
       <module name="crafting-interpreters" />
@@ -100,6 +112,7 @@
       <workItem from="1737102839699" duration="1503000" />
       <workItem from="1737104357241" duration="1169000" />
       <workItem from="1737201855874" duration="5830000" />
+      <workItem from="1737444460653" duration="2864000" />
     </task>
     <servers />
   </component>
