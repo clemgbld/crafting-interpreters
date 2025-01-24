@@ -34,6 +34,17 @@ z -> "." IDENTIFIER
 
 Bonus: this expression seems to encode a parser that generate an AST 
 
+## 2
+
+The Visitor pattern lets you emulate the functional style in an object-oriented language. Devise a complementary pattern for a functional language. It should let you bundle all of the operations on one type together and let you define new types easily.
+
+(SML or Haskell would be ideal for this exercise, but Scheme or another Lisp works as well.)
+
+--
+
+I choose scheme to do that task since i already completed SICP i'm pretty familiar with the language.
+
+see file "visitor.scm"
 
 
 
