@@ -3,6 +3,9 @@ package com.craftinginterpreters.lox;
 import java.util.Arrays;
 
 public class AstPrinter implements Expr.Visitor<String> {
+    public String print(Expr ast) {
+        return ast.accept(this);
+    }
     @Override
     public String visitBinaryExpr(Expr.Binary expr) {
         return parenthesize(expr.operator.lexeme,expr.left,expr.right);
@@ -35,5 +38,6 @@ public class AstPrinter implements Expr.Visitor<String> {
         builder.append(")");
         return builder.toString();
     }
+
 
 }
