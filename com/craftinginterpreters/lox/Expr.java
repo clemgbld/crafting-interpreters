@@ -1,6 +1,6 @@
 package com.craftinginterpreters.lox;
 
-import java.util.List;
+import java.util.Objects;
 
 abstract class Expr {
  interface Visitor<R> {
@@ -25,7 +25,19 @@ public static class Binary extends Expr {
    final Expr left;
    final Token operator;
    final Expr right;
-   }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Binary binary)) return false;
+        return Objects.equals(operator, binary.operator);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(operator);
+    }
+}
 public static class Grouping extends Expr {
      Grouping(Expr expression) {
       this.expression = expression;
@@ -49,7 +61,19 @@ public static class Literal extends Expr {
     }
 
    final Object value;
-   }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Literal literal)) return false;
+        return Objects.equals(value, literal.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+}
 public static class Unary extends Expr {
      Unary(Token operator , Expr right) {
       this.operator = operator;
@@ -63,7 +87,19 @@ public static class Unary extends Expr {
 
    final Token operator ;
    final Expr right;
-   }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Unary unary)) return false;
+        return Objects.equals(operator, unary.operator);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(operator);
+    }
+}
 
    abstract <R> R accept(Visitor<R> visitor);
 }

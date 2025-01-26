@@ -7,16 +7,9 @@
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/challenges-6.md" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/ParserTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Expr.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Expr.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Token.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Token.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Expr$Binary.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Expr$Binary.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Expr$Grouping.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Expr$Grouping.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Expr$Literal.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Expr$Literal.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Expr$Unary.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Expr$Unary.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Token.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Token.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +62,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.ParserTest">
+  <component name="RunManager" selected="JUnit.ParserTest.shouldBeAbleToParseSimpleBlocks">
     <configuration name="AstPrinter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.AstPrinter" />
       <module name="crafting-interpreters" />
@@ -117,21 +110,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ParserTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="crafting-interpreters" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.craftinginterpreters.lox.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.craftinginterpreters.lox" />
-      <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.ParserTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="ParserTest.shouldBeAbleToParseSimpleBlocks" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="crafting-interpreters" />
       <extension name="coverage">
@@ -150,7 +128,6 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ParserTest" />
         <item itemvalue="JUnit.ParserTest.shouldBeAbleToParseSimpleBlocks" />
         <item itemvalue="Application.Lox" />
         <item itemvalue="Application.AstPrinter" />
@@ -177,7 +154,7 @@
       <workItem from="1737474902268" duration="274000" />
       <workItem from="1737476005752" duration="2643000" />
       <workItem from="1737616255998" duration="1475000" />
-      <workItem from="1737907569573" duration="5118000" />
+      <workItem from="1737907569573" duration="1790000" />
     </task>
     <servers />
   </component>

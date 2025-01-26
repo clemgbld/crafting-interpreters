@@ -17,15 +17,26 @@ public class Parser {
 
     Expr parse(){
         try{
-           return expresion();
+           return expression();
         }catch (ParseError error){
             return null;
         }
     }
     
-    private Expr expresion(){
-        return equality();
+    private Expr expression(){
+        return block();
     }
+
+    private Expr block() {
+        Expr expr = equality();
+        while (match(COMMA)){
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Binary(expr,operator,right);
+        }
+        return expr;
+    }
+
 
     private Expr equality() {
         return buildRule(this::comparison,BANG_EQUAL, EQUAL_EQUAL);
@@ -60,7 +71,7 @@ public class Parser {
             return new Expr.Literal(previous().literal);
         }
         if(match(LEFT_PAREN)){
-            Expr expr = expresion();
+            Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
@@ -108,7 +119,7 @@ public class Parser {
     }
 
     private Token previous(){
-        return tokens.get(current -1);
+        return tokens.get(current - 1);
     }
 
     boolean match(TokenType... types){
