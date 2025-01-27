@@ -1,3 +1,5 @@
+# Challenge 6
+
 ## 1
 
 In C, a block is a statement form that allows you to pack a series of statements where a single one is expected. The comma operator is an analogous syntax for expressions. A comma-separated series of expressions can be given where a single expression is expected (except inside a function call’s argument list). At runtime, the comma operator evaluates the left operand and discards the result. Then it evaluates and returns the right operand.
@@ -7,7 +9,7 @@ Add support for comma expressions. Give them the same precedence and associativi
 ### Grammar
 
 expression     → block ;
-block          → equality ("," block)*
+block          → equality ("," equality)*
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
@@ -20,3 +22,30 @@ primary        → NUMBER | STRING | "true" | "false" | "nil"
 ### Code
 
 The code is written in the java class parser
+
+## 2
+
+Likewise, add support for the C-style conditional or “ternary” operator ?:. What precedence level is allowed between the ? and :? Is the whole operator left-associative or right-associative?
+
+--
+
+? must appear before : and the ternary operator is left associative.
+
+### Grammar
+
+expression     → ternary ;
+ternary        →  block ("?" ternary ":"  ternary)? ;
+block          → equality ("," equality)*
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term           → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary
+| primary ;
+primary        → NUMBER | STRING | "true" | "false" | "nil"
+| "(" expression ")" ;
+
+### Code
+
+The code is written in the java class parser
+

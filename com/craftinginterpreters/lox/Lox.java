@@ -43,7 +43,7 @@ public class Lox {
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(tokens);
+        Parser parser = new Parser(tokens,Lox::error);
         Expr ast = parser.parse();
         if(hadError) return;
         System.out.println(new AstPrinter().print(ast));
@@ -58,7 +58,7 @@ public class Lox {
         hadError = true;
     }
 
-    public static void error(Token token, String message){
+    private static void error(Token token, String message){
         if(token.type == TokenType.EOF){
            report(token.line, "at end", message);
         }else {

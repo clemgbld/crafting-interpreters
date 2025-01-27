@@ -1,18 +1,20 @@
 package com.craftinginterpreters.lox;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.craftinginterpreters.lox.TokenType.*;
 
 public class Parser {
-
     private static class ParseError extends RuntimeException {}
+    private final BiConsumer<Token,String> errorFn;
     private final List<Token> tokens;
     private int current = 0;
 
-    public Parser(List<Token> tokens) {
+    public Parser(List<Token> tokens,BiConsumer<Token, String> errorFn) {
         this.tokens = tokens;
+        this.errorFn = errorFn;
     }
 
     Expr parse(){
@@ -24,17 +26,28 @@ public class Parser {
     }
     
     private Expr expression(){
-        return block();
+        return ternary();
+    }
+
+    private Expr ternary() {
+        Expr expr = block();
+        if(match(QUESTION_MARK)){
+            Token questionMark = previous();
+            Expr thenExpr = ternary();
+            consume(COLON,"Expect ':' after expression.");
+            Token colon = previous();
+            Expr elseExpr = ternary();
+            return new Expr.Binary(expr,questionMark, new Expr.Binary(
+                    thenExpr,
+                    colon,
+                    elseExpr
+            ));
+        }
+        return expr;
     }
 
     private Expr block() {
-        Expr expr = equality();
-        while (match(COMMA)){
-            Token operator = previous();
-            Expr right = equality();
-            expr = new Expr.Binary(expr,operator,right);
-        }
-        return expr;
+        return buildRule(this::equality,COMMA);
     }
 
 
@@ -84,7 +97,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message){
-        Lox.error(token,message);
+        errorFn.accept(token,message);
         return new ParseError();
     }
 
