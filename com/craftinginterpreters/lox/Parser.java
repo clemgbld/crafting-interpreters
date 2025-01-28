@@ -88,6 +88,14 @@ public class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
+
+        if(match(PLUS,SLASH,QUESTION_MARK,COLON,COMMA,BANG_EQUAL,EQUAL_EQUAL,LESS,GREATER,GREATER_EQUAL,LESS_EQUAL)){
+            Token operator = previous();
+            errorFn.accept(peek(), operator.lexeme + " operator detected at the beginning of an expression.");
+            advance();
+            return expression();
+        }
+
         throw error(peek(),"Expect expression.");
     }
 
