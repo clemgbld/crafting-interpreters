@@ -48,6 +48,9 @@ public class Interpreter implements Expr.Visitor<Object>{
                 return (double) left - (double) right;
             case SLASH :
                 checkNumberOperand(expr.operator,left,right);
+                if(left.toString().endsWith(".0")){
+                    throw new RuntimeError(expr.operator,"Cannot divide integer by zero.");
+                }
                 return (double) left / (double) right;
             case STAR :
                 checkNumberOperand(expr.operator,left,right);

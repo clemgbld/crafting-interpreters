@@ -40,4 +40,17 @@ public class InterpreterTest {
         interpreter.interpret(new Binary(new Literal(false),new Token(TokenType.PLUS,"+",null,1),new Literal("bla")));
         assertEquals("Operands must be either number or strings.",errors.get(0).getMessage());
     }
+
+    @Test
+    public void shouldBeInfinityWhenDividingByAFloatingPointNumber(){
+        interpreter.interpret(new Binary(new Literal(1.5),new Token(TokenType.SLASH,"+",null,1),new Literal(0.0)));
+        assertEquals("Infinity",output.get(0));
+    }
+
+    @Test
+    public void shouldThrowAnErrorWhenWeTryingToDivideAnIntegerByZero(){
+        interpreter.interpret(new Binary(new Literal(1.0),new Token(TokenType.SLASH,"+",null,1),new Literal(0.0)));
+        assertEquals("Cannot divide integer by zero.",errors.get(0).getMessage());
+    }
+
 }

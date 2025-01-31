@@ -21,3 +21,17 @@ Many languages define + such that if either operand is a string, the other is co
 --
 
 implementation in the java class Interpreter
+
+## 3
+
+What happens right now if you divide a number by zero? What do you think should happen? Justify your choice. How do other languages you know handle division by zero, and why do they make the choices they do?
+
+Change the implementation in visitBinaryExpr() to detect and report a runtime error for this case.
+
+--
+
+I would do it like scheme and java and c, etc... throw for integers but let divide by zero for floating-point numbers to respect  IEEE 754 standards.
+
+in js it let you divide by zero
+
+implementation in the java class Interpreter
