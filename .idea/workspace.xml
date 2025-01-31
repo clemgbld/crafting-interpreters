@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/challenges-7.md" beforeDir="false" afterPath="$PROJECT_DIR$/challenges-7.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/challenges-7.md" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/challenges-7.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/InterpreterTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/InterpreterTest.class" afterDir="false" />
-    </list>
+    <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -157,7 +150,7 @@
       <workItem from="1738137726732" duration="13000" />
       <workItem from="1738221511142" duration="578000" />
       <workItem from="1738222290852" duration="1633000" />
-      <workItem from="1738308776355" duration="4557000" />
+      <workItem from="1738308776355" duration="4896000" />
     </task>
     <servers />
   </component>
