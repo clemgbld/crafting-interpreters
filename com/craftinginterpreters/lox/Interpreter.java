@@ -1,13 +1,24 @@
 package com.craftinginterpreters.lox;
 
+import java.util.function.Consumer;
+
 public class Interpreter implements Expr.Visitor<Object>{
+
+    private final Consumer<Object> log;
+
+    private final Consumer<RuntimeError> logRuntimeError;
+
+    public Interpreter(Consumer<Object> log, Consumer<RuntimeError> logRuntimeError) {
+        this.log = log;
+        this.logRuntimeError = logRuntimeError;
+    }
 
     public void interpret(Expr expression){
         try{
             Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            log.accept(stringify(value));
         }catch (RuntimeError runtimeError){
-            Lox.runtimeError(runtimeError);
+            logRuntimeError.accept(runtimeError);
         }
     }
 
@@ -15,7 +26,6 @@ public class Interpreter implements Expr.Visitor<Object>{
     public Object visitBinaryExpr(Expr.Binary expr) {
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
-
          switch (expr.operator.type) {
              case GREATER:
                  checkNumberOperand(expr.operator,left,right);
@@ -47,9 +57,18 @@ public class Interpreter implements Expr.Visitor<Object>{
                         return (double) left + (double) right;
                     }
                     if(left instanceof String && right instanceof String){
-                        return (String) left + (String) right;
+                        return  left + (String) right;
                     }
-                    throw new RuntimeError(expr.operator,"Operands must be two numbers or two strings");
+
+                    if(left instanceof String && right instanceof Double){
+                        return  left + stringify(right);
+                    }
+
+                    if(left instanceof Double && right instanceof String){
+                    return stringify(left) +  right;
+                    }
+
+                    throw new RuntimeError(expr.operator,"Operands must be either number or strings.");
         };
         return null;
     }
