@@ -1,6 +1,7 @@
 package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.Variable;
+import com.craftinginterpreters.lox.Stmt.Block;
 import com.craftinginterpreters.lox.Stmt.Expression;
 import com.craftinginterpreters.lox.Stmt.Print;
 import com.craftinginterpreters.lox.Stmt.Var;
@@ -36,7 +37,6 @@ public class Parser {
             synchronize();
             return null;
         }
-
     }
     private Stmt varDeclaration(){
        Token name = consume(IDENTIFIER, "Expect variable name");
@@ -50,7 +50,17 @@ public class Parser {
 
     private Stmt statement() {
         if(match(PRINT)) return printStatement();
+        if(match(LEFT_BRACE)) return new Block(block());
         return expressionStatement();
+    }
+
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()){
+            statements.add(declaration());
+        }
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
     }
 
     private Stmt printStatement() {
@@ -66,7 +76,24 @@ public class Parser {
     }
 
     private Expr expression(){
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment(){
+
+        Expr expr = equality();
+
+       if(match(EQUAL)){
+           Token equals = previous();
+           Expr value = assignment();
+           if(expr instanceof Expr.Variable){
+               Token name = ((Expr.Variable) expr).name;
+               return  new Expr.Assign(name,value);
+           }
+           error(equals,"Invalid assignment target");
+       }
+
+        return expr;
     }
 
     private Expr equality() {
