@@ -5,11 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/challenges-8.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/ParserTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/challenges-8.md" beforeDir="false" afterPath="$PROJECT_DIR$/challenges-8.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +44,7 @@
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "challenges-8",
     "jdk.selected.JAVA_MODULE": "17",
@@ -62,7 +61,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.ParserTest">
+  <component name="RunManager" selected="Application.Lox">
     <configuration name="AstPrinter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.AstPrinter" />
       <module name="crafting-interpreters" />
@@ -110,6 +109,21 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="InterpreterTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="crafting-interpreters" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.craftinginterpreters.lox.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.craftinginterpreters.lox" />
+      <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.InterpreterTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ParserTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="crafting-interpreters" />
       <extension name="coverage">
@@ -127,8 +141,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ParserTest" />
         <item itemvalue="Application.Lox" />
+        <item itemvalue="JUnit.InterpreterTest" />
+        <item itemvalue="JUnit.ParserTest" />
         <item itemvalue="Application.AstPrinter" />
         <item itemvalue="Application.Main" />
       </list>
@@ -160,7 +175,7 @@
       <workItem from="1738320641342" duration="45000" />
       <workItem from="1738333153417" duration="9862000" />
       <workItem from="1738412364892" duration="3730000" />
-      <workItem from="1738515077919" duration="1461000" />
+      <workItem from="1738515077919" duration="4432000" />
     </task>
     <servers />
   </component>

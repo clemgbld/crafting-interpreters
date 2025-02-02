@@ -19,7 +19,8 @@ public class GenerateAst {
                 "Literal  : Object value",
                 "Unary    : Token operator , Expr right",
                 "Variable : Token name",
-                "Assign   : Token name, Expr value"
+                "Assign   : Token name, Expr value",
+                "NotInitialized  : Token name"
         ));
 
         defineAst(outputDir, "Stmt", Arrays.asList(

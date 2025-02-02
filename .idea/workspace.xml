@@ -5,19 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/challenges-8.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/ParserTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/challenges-8.md" beforeDir="false" afterPath="$PROJECT_DIR$/challenges-8.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/AstPrinter.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/AstPrinter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Expr.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Expr.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Interpreter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Lox.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Lox.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Lox.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Lox.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser$ParseError.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser$ParseError.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/tool/GenerateAst.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/tool/GenerateAst.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/challenges-8.md" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/challenges-8.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/InterpreterTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/InterpreterTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/tool/GenerateAst.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/tool/GenerateAst.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +69,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.Lox">
+  <component name="RunManager" selected="JUnit.InterpreterTest">
     <configuration name="AstPrinter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.AstPrinter" />
       <module name="crafting-interpreters" />
@@ -151,8 +149,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Lox" />
         <item itemvalue="JUnit.InterpreterTest" />
+        <item itemvalue="Application.Lox" />
         <item itemvalue="JUnit.ParserTest" />
         <item itemvalue="Application.AstPrinter" />
         <item itemvalue="Application.Main" />
@@ -185,7 +183,7 @@
       <workItem from="1738320641342" duration="45000" />
       <workItem from="1738333153417" duration="9862000" />
       <workItem from="1738412364892" duration="3730000" />
-      <workItem from="1738515077919" duration="3307000" />
+      <workItem from="1738515077919" duration="5798000" />
     </task>
     <servers />
   </component>

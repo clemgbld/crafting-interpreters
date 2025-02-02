@@ -1,6 +1,7 @@
 package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.Assign;
+import com.craftinginterpreters.lox.Expr.NotInitialized;
 import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.Block;
 import com.craftinginterpreters.lox.Stmt.Expression;
@@ -125,6 +126,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = evaluate(expr.value);
          environment.assign(expr.name,value);
          return value;
+    }
+
+    @Override
+    public Object visitNotInitializedExpr(NotInitialized expr) {
+        throw new RuntimeError(expr.name,"Variable " + expr.name.lexeme + " not initialized.");
     }
 
     @Override

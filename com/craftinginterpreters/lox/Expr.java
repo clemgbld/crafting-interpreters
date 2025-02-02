@@ -10,6 +10,7 @@ abstract class Expr {
  R visitUnaryExpr(Unary expr);
  R visitVariableExpr(Variable expr);
  R visitAssignExpr(Assign expr);
+ R visitNotInitializedExpr(NotInitialized expr);
 
   }
 public static class Binary extends Expr {
@@ -91,6 +92,18 @@ public static class Assign extends Expr {
 
    final Token name;
    final Expr value;
+   }
+public static class NotInitialized extends Expr {
+     NotInitialized(Token name) {
+      this.name = name;
+    }
+
+  @Override
+  <R> R accept(Visitor<R> visitor) {
+      return visitor.visitNotInitializedExpr(this);
+    }
+
+   final Token name;
    }
 
    abstract <R> R accept(Visitor<R> visitor);
