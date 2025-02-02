@@ -8,14 +8,26 @@ import com.craftinginterpreters.lox.Stmt.Print;
 import com.craftinginterpreters.lox.Stmt.Var;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
+    private final Consumer<String> log;
+
     private Environment environment = new Environment();
 
-    public void interpret(List<Stmt> statements) {
+    public Interpreter(Consumer<String> log) {
+        this.log = log;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void interpret(Object obj) {
         try {
-            statements.forEach(this::execute);
+           if(obj instanceof Expr){
+               log.accept(stringify(evaluate((Expr) obj)));
+           }else{
+               ((List<Stmt>) obj).forEach(this::execute);
+           }
         } catch (RuntimeError runtimeError) {
             Lox.runtimeError(runtimeError);
         }
@@ -124,7 +136,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitPrintStmt(Print stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println(stringify(value));
+        log.accept(stringify(value));
         return null;
     }
 

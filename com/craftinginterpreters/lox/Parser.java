@@ -1,6 +1,5 @@
 package com.craftinginterpreters.lox;
 
-import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.Block;
 import com.craftinginterpreters.lox.Stmt.Expression;
 import com.craftinginterpreters.lox.Stmt.Print;
@@ -22,8 +21,11 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    List<Stmt> parse(){
+    Object parse(){
+        Object exprOrStmt = declarationOrExpression();
+        if(exprOrStmt instanceof  Expr) return exprOrStmt;
        List<Stmt> statements = new ArrayList<>();
+       statements.add((Stmt)exprOrStmt);
        while (!isAtEnd()){
            statements.add(declaration());
        }
@@ -35,6 +37,15 @@ public class Parser {
             return statement();
         }catch (ParseError error){
             synchronize();
+            return null;
+        }
+    }
+
+    private Object declarationOrExpression(){
+        try{
+            if(match(VAR)) return varDeclaration();
+            return expressionOrStatement();
+        }catch (ParseError error){
             return null;
         }
     }
@@ -52,6 +63,12 @@ public class Parser {
         if(match(PRINT)) return printStatement();
         if(match(LEFT_BRACE)) return new Block(block());
         return expressionStatement();
+    }
+
+    private Object expressionOrStatement() {
+        if(match(PRINT)) return printStatement();
+        if(match(LEFT_BRACE)) return new Block(block());
+        return expressionOrExpressionStatement();
     }
 
     private List<Stmt> block() {
@@ -73,6 +90,15 @@ public class Parser {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after value");
         return new Expression(expr);
+    }
+
+    Object expressionOrExpressionStatement(){
+        Expr expr = expression();
+        if(check(SEMICOLON)){
+            advance();
+            return new Expression(expr);
+        }
+        return expr;
     }
 
     private Expr expression(){
