@@ -12,8 +12,9 @@ import static org.junit.Assert.*;
 
 public class InterpreterTest {
     private final List<String> logs = new ArrayList<>();
+    private final List<RuntimeError> errorsLog = new ArrayList<>();
 
-    private final Interpreter interpreter = new Interpreter(this::log);
+    private final Interpreter interpreter = new Interpreter(this::log, this::logError);
 
     @Test
     public void shouldBeAbleToExecuteStatements(){
@@ -50,18 +51,27 @@ public class InterpreterTest {
 
     @Test
     public void shouldThrowARuntimeErrorWhenTryingToAccessAVariableNotExplicitlyInitialized() throws RuntimeError{
-        try{
-            interpreter.interpret(List.of(
-                    new Stmt.Var(new Token(TokenType.IDENTIFIER,"a",null,1),new Expr.NotInitialized(new Token(TokenType.IDENTIFIER,"a",null,1))),
-                    new Print(new Variable(new Token(TokenType.IDENTIFIER,"a",null,1)))
-            ));
-        }catch (RuntimeError runtimeError){
-            assertEquals(TokenType.IDENTIFIER,runtimeError.token.type);
-            assertEquals("Variable a not initialized.",runtimeError.getMessage());
-        }
+        interpreter.interpret(List.of(
+                new Stmt.Var(new Token(TokenType.IDENTIFIER,"a",null,1),new Expr.NotInitialized(new Token(TokenType.IDENTIFIER,"a",null,1))),
+                new Print(new Variable(new Token(TokenType.IDENTIFIER,"a",null,1)))
+        ));
+        assertEquals("Variable a not initialized.",errorsLog.get(0).getMessage());
+        assertEquals(TokenType.IDENTIFIER,errorsLog.get(0).token.type);
+    }
+
+    @Test
+    public void shouldNotThrowWhenDefiningANotInitializedVar(){
+        interpreter.interpret(List.of(
+                new Stmt.Var(new Token(TokenType.IDENTIFIER,"a",null,1),new Expr.NotInitialized(new Token(TokenType.IDENTIFIER,"a",null,1)))
+        ));
+        assertTrue(errorsLog.isEmpty());
     }
 
     private void log(String log){
         logs.add(log);
+    }
+
+    private void logError(RuntimeError runtimeError){
+        errorsLog.add(runtimeError);
     }
 }

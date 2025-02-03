@@ -51,7 +51,7 @@ public class Parser {
     }
     private Stmt varDeclaration(){
        Token name = consume(IDENTIFIER, "Expect variable name");
-       Expr initializer = null;
+       Expr initializer = new Expr.NotInitialized(name);
        if(match(EQUAL)){
            initializer = expression();
        }

@@ -15,10 +15,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private final Consumer<String> log;
 
+    private final Consumer<RuntimeError> logError;
+
     private Environment environment = new Environment();
 
-    public Interpreter(Consumer<String> log) {
+    public Interpreter(Consumer<String> log, Consumer<RuntimeError> logError) {
         this.log = log;
+        this.logError = logError;
     }
 
     @SuppressWarnings("unchecked")
@@ -30,7 +33,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                ((List<Stmt>) obj).forEach(this::execute);
            }
         } catch (RuntimeError runtimeError) {
-            Lox.runtimeError(runtimeError);
+            logError.accept(runtimeError);
         }
     }
 
@@ -118,19 +121,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(Variable expr) {
-        return environment.get(expr.name);
+        return environment.get(expr.name).get();
     }
 
     @Override
     public Object visitAssignExpr(Assign expr) {
         Object value = evaluate(expr.value);
-         environment.assign(expr.name,value);
+         environment.assign(expr.name, ()-> value);
          return value;
     }
 
     @Override
     public Object visitNotInitializedExpr(NotInitialized expr) {
-        throw new RuntimeError(expr.name,"Variable " + expr.name.lexeme + " not initialized.");
+       return null;
     }
 
     @Override
@@ -148,7 +151,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitVarStmt(Var stmt) {
-        environment.define(stmt.name.lexeme, stmt.initializer != null ? evaluate(stmt.initializer) : null);
+        environment.define(stmt.name.lexeme,  !(stmt.initializer instanceof Expr.NotInitialized) ? () -> evaluate(stmt.initializer) : ()->{
+            throw new RuntimeError(stmt.name,"Variable " + stmt.name.lexeme + " not initialized.");
+        } );
         return null;
     }
 
