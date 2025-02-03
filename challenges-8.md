@@ -14,5 +14,17 @@ Maybe you want Lox to be a little more explicit about variable initialization. I
 
 --
 
-modified the class Interpreter
+modified the classes Interpreter and Parser
 
+## 3
+
+var a = 1;
+{
+var a = a + 2;
+print a;
+}
+What did you expect it to do? Is it what you think it should do? What does analogous code in other languages you are familiar with do? What do you think users will expect this to do?
+
+--
+I expected this code to print 3 like in C-like language.
+The users should expect this code to evaluate a before it is reassigned because assignment is right-associative.

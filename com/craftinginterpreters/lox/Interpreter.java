@@ -121,13 +121,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(Variable expr) {
-        return environment.get(expr.name).get();
+        Object value = environment.get(expr.name);
+        if(value instanceof RuntimeError){
+            throw (RuntimeError) value;
+        }
+        return value;
     }
 
     @Override
     public Object visitAssignExpr(Assign expr) {
         Object value = evaluate(expr.value);
-         environment.assign(expr.name, ()-> value);
+         environment.assign(expr.name, value);
          return value;
     }
 
@@ -151,9 +155,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitVarStmt(Var stmt) {
-        environment.define(stmt.name.lexeme,  !(stmt.initializer instanceof Expr.NotInitialized) ? () -> evaluate(stmt.initializer) : ()->{
-            throw new RuntimeError(stmt.name,"Variable " + stmt.name.lexeme + " not initialized.");
-        } );
+        environment.define(stmt.name.lexeme,  !(stmt.initializer instanceof Expr.NotInitialized) ? evaluate(stmt.initializer) :
+             new RuntimeError(stmt.name,"Variable " + stmt.name.lexeme + " not initialized."));
         return null;
     }
 
