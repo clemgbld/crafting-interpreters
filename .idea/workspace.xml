@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/run.txt" beforeDir="false" afterPath="$PROJECT_DIR$/run.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/challenges-9.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +44,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;challenges-9&quot;,
     &quot;jdk.selected.JAVA_MODULE&quot;: &quot;17&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/cgombauld/crafting-interpreters&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -142,7 +143,8 @@
       <workItem from="1738333153417" duration="9862000" />
       <workItem from="1738412364892" duration="3730000" />
       <workItem from="1738515077919" duration="332000" />
-      <workItem from="1738653404636" duration="3466000" />
+      <workItem from="1738653404636" duration="4345000" />
+      <workItem from="1738658713692" duration="1024000" />
     </task>
     <servers />
   </component>
