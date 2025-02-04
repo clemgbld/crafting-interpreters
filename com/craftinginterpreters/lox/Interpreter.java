@@ -52,9 +52,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 checkNumberOperand(expr.operator, left, right);
                 return (double) left <= (double) right;
             case BANG_EQUAL:
-                return isEqual(left, right);
-            case EQUAL_EQUAL:
                 return !isEqual(left, right);
+            case EQUAL_EQUAL:
+                return isEqual(left, right);
             case MINUS:
                 checkNumberOperand(expr.operator, left, right);
                 return (double) left - (double) right;
@@ -132,7 +132,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitIfStmt(If stmt) {
-        if(isTruthy(stmt.condition)){
+        if(isTruthy(evaluate(stmt.condition))){
             execute(stmt.thenBranch);
         }else if(stmt.elseBranch != null) {
             execute(stmt.elseBranch);

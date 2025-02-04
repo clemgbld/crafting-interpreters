@@ -104,7 +104,7 @@ public class Parser {
     private Stmt ifStatement() {
         consume(LEFT_PAREN,"Expect '(' after 'if'.");
         Expr condition = expression();
-        consume(RIGHT_BRACE, "Expect ')' after condition.");
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
         Stmt thenBranch = statement();
         Stmt elseBranch = null;
         if(match(ELSE)){
@@ -167,7 +167,7 @@ public class Parser {
 
    private Expr and(){
         Expr expr = equality();
-        while (match(OR)){
+        while (match(AND)){
             Token operator = previous();
             Expr right = equality();
             expr = new Logical(expr,operator,right);
