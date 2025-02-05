@@ -1,23 +1,27 @@
 package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.Logical;
-import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.craftinginterpreters.lox.TokenType.*;
 
 public class Parser {
 
+
     private static class ParseError extends RuntimeException {}
     private final List<Token> tokens;
+
+    private final BiConsumer<Token,String> logParseError;
     private int current = 0;
 
-    public Parser(List<Token> tokens) {
+    public Parser(List<Token> tokens, BiConsumer<Token, String> logParseError) {
         this.tokens = tokens;
+        this.logParseError = logParseError;
     }
 
     List<Stmt> parse(){
@@ -216,6 +220,11 @@ public class Parser {
        if(match(IDENTIFIER)){
            return new Expr.Variable(previous());
        }
+
+       if(check(BREAK)){
+           throw error(peek(),"Break not in a loop.");
+       }
+
         throw error(peek(),"Expect expression.");
     }
 
@@ -225,7 +234,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message){
-        Lox.error(token,message);
+        logParseError.accept(token,message);
         return new ParseError();
     }
 
@@ -242,6 +251,7 @@ public class Parser {
                 case WHILE:
                 case PRINT:
                 case RETURN:
+                case BREAK:
                     return;
             }
             advance();
