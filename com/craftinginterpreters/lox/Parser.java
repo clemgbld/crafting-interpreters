@@ -27,14 +27,14 @@ public class Parser {
     List<Stmt> parse(){
        List<Stmt> statements = new ArrayList<>();
        while (!isAtEnd()){
-           statements.add(declaration());
+           statements.add(declaration(false));
        }
            return statements;
     }
-    private Stmt declaration(){
+    private Stmt declaration(boolean isBreak){
         try{
             if(match(VAR)) return varDeclaration();
-            return statement();
+            return isBreak ? breakStatement() : statement();
         }catch (ParseError error){
             synchronize();
             return null;
@@ -51,76 +51,109 @@ public class Parser {
     }
 
     private Stmt statement() {
+       return statement(false);
+    }
+
+    private Stmt statement(boolean isBreak) {
         if(match(WHILE)) return whileStatement();
         if(match(FOR)) return forStatement();
-        if(match(IF)) return ifStatement();
+        if(match(IF)) return ifStatement(isBreak);
         if(match(PRINT)) return printStatement();
-        if(match(LEFT_BRACE)) return new Block(block());
+        if(match(LEFT_BRACE)) return new Block(block(isBreak));
         return expressionStatement();
+    }
+
+    private Stmt breakStatement() {
+        if(match(BREAK)){
+                var breakStmt = new Stmt.Break();
+                consume(SEMICOLON,"Expect ';' after loop break.");
+                return breakStmt;
+        }
+       return statement(true);
     }
 
     private Stmt forStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+/* Control Flow for-statement < Control Flow for-initializer
+    // More here...
+*/
+//> for-initializer
         Stmt initializer;
-        if(match(SEMICOLON)){
+        if (match(SEMICOLON)) {
             initializer = null;
         } else if (match(VAR)) {
-           initializer = varDeclaration();
-        }else{
+            initializer = varDeclaration();
+        } else {
             initializer = expressionStatement();
         }
+//< for-initializer
+//> for-condition
+
         Expr condition = null;
-        if(!check(SEMICOLON)){
+        if (!check(SEMICOLON)) {
             condition = expression();
         }
-        consume(SEMICOLON,"Expect ';' after loop condition.");
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+//< for-condition
+//> for-increment
+
         Expr increment = null;
-        if(!check(RIGHT_BRACE)){
+        if (!check(RIGHT_PAREN)) {
             increment = expression();
         }
-        consume(RIGHT_PAREN, "Expect ')' after 'for'.");
-        Stmt body = statement();
-        if(increment != null){
-            body = new Stmt.Block(
-                    List.of(body,new Stmt.Expression(increment))
-            );
-        }
-        if(condition == null){
-            condition = new Expr.Literal(true);
-        }
-        body = new Stmt.While(condition,body);
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+//< for-increment
+//> for-body
+        Stmt body = breakStatement();
 
-       if(initializer != null){
-           body = new Stmt.Block(List.of(initializer,body));
-       }
-       return body;
+//> for-desugar-increment
+        if (increment != null) {
+            body = new Stmt.Block(
+                    List.of(
+                            body,
+                            new Stmt.Expression(increment)));
+        }
+
+//< for-desugar-increment
+//> for-desugar-condition
+        if (condition == null) condition = new Expr.Literal(true);
+        body = new Stmt.While(condition, body);
+
+//< for-desugar-condition
+//> for-desugar-initializer
+        if (initializer != null) {
+            body = new Stmt.Block(List.of(initializer, body));
+        }
+//< for-desugar-initializer
+        return body;
     }
 
     private Stmt whileStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'while'.");
         Expr condition = expression();
         consume(RIGHT_PAREN, "Expect ')' after condition.");
-        Stmt body = statement();
+        Stmt body = breakStatement();
 
         return new Stmt.While(condition, body);
     }
 
-    private Stmt ifStatement() {
+    private Stmt ifStatement(boolean isBreak) {
         consume(LEFT_PAREN,"Expect '(' after 'if'.");
         Expr condition = expression();
         consume(RIGHT_PAREN, "Expect ')' after condition.");
-        Stmt thenBranch = statement();
+        Stmt thenBranch = isBreak ? breakStatement() : statement();
         Stmt elseBranch = null;
         if(match(ELSE)){
-            elseBranch = statement();
+            elseBranch = isBreak ? breakStatement() : statement();
         }
         return new Stmt.If(condition,thenBranch,elseBranch);
     }
 
-    private List<Stmt> block() {
+    private List<Stmt> block(boolean isBreak) {
         List<Stmt> statements = new ArrayList<>();
         while (!check(RIGHT_BRACE) && !isAtEnd()){
-            statements.add(declaration());
+            statements.add(declaration(isBreak));
         }
         consume(RIGHT_BRACE, "Expect '}' after block.");
         return statements;
