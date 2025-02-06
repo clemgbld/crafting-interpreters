@@ -57,39 +57,60 @@ public class Parser {
 
     private Stmt forStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+/* Control Flow for-statement < Control Flow for-initializer
+    // More here...
+*/
+//> for-initializer
         Stmt initializer;
-        if(match(SEMICOLON)){
+        if (match(SEMICOLON)) {
             initializer = null;
         } else if (match(VAR)) {
-           initializer = varDeclaration();
-        }else{
+            initializer = varDeclaration();
+        } else {
             initializer = expressionStatement();
         }
+//< for-initializer
+//> for-condition
+
         Expr condition = null;
-        if(!check(SEMICOLON)){
+        if (!check(SEMICOLON)) {
             condition = expression();
         }
-        consume(SEMICOLON,"Expect ';' after loop condition.");
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+//< for-condition
+//> for-increment
+
         Expr increment = null;
-        if(!check(RIGHT_BRACE)){
+        if (!check(RIGHT_PAREN)) {
             increment = expression();
         }
-        consume(RIGHT_PAREN, "Expect ')' after 'for'.");
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+//< for-increment
+//> for-body
         Stmt body = statement();
-        if(increment != null){
-            body = new Stmt.Block(
-                    List.of(body,new Stmt.Expression(increment))
-            );
-        }
-        if(condition == null){
-            condition = new Expr.Literal(true);
-        }
-        body = new Stmt.While(condition,body);
 
-       if(initializer != null){
-           body = new Stmt.Block(List.of(initializer,body));
-       }
-       return body;
+//> for-desugar-increment
+        if (increment != null) {
+            body = new Stmt.Block(
+                    List.of(
+                            body,
+                            new Stmt.Expression(increment)));
+        }
+
+//< for-desugar-increment
+//> for-desugar-condition
+        if (condition == null) condition = new Expr.Literal(true);
+        body = new Stmt.While(condition, body);
+
+//< for-desugar-condition
+//> for-desugar-initializer
+        if (initializer != null) {
+            body = new Stmt.Block(List.of(initializer, body));
+        }
+
+//< for-desugar-initializer
+        return body;
     }
 
     private Stmt whileStatement() {
