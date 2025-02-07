@@ -5,9 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/BreakException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/ParserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/ParserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Interpreter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Lox.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Lox.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.txt" beforeDir="false" afterPath="$PROJECT_DIR$/run.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Lox.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Lox.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/challenges-9.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/challenges-9.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/crafting-interpreters.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/target/classes/run.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +82,12 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="JUnit.ParserTest.shouldBeAbleToBreakInAForLoop">
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.craftinginterpreters.lox" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Lox">
     <configuration name="AstPrinter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.AstPrinter" />
       <module name="crafting-interpreters" />
@@ -103,9 +129,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Main" />
+    <configuration name="InterpreterTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="crafting-interpreters" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.craftinginterpreters.lox.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.craftinginterpreters.lox" />
+      <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.InterpreterTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -143,11 +177,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Lox" />
+        <item itemvalue="JUnit.InterpreterTest" />
         <item itemvalue="JUnit.ParserTest.shouldBeAbleToBreakInAForLoop" />
         <item itemvalue="JUnit.ParserTest" />
-        <item itemvalue="Application.Lox" />
         <item itemvalue="Application.AstPrinter" />
-        <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
   </component>
@@ -183,6 +217,7 @@
       <workItem from="1738692812801" duration="2705000" />
       <workItem from="1738738264014" duration="3022000" />
       <workItem from="1738824722347" duration="2762000" />
+      <workItem from="1738913174126" duration="1770000" />
     </task>
     <servers />
   </component>

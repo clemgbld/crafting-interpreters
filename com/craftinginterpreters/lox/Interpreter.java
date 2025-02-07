@@ -6,16 +6,26 @@ import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Environment environment = new Environment();
 
+    private Consumer<String> log;
+    private Consumer<RuntimeError> logError;
+
+    public Interpreter(Consumer<String> log, Consumer<RuntimeError> logError) {
+        this.log = log;
+        this.logError = logError;
+    }
+
     public void interpret(List<Stmt> statements) {
         try {
             statements.forEach(this::execute);
         } catch (RuntimeError runtimeError) {
-            Lox.runtimeError(runtimeError);
+            logError.accept(runtimeError);
         }
     }
 
@@ -69,11 +79,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                     return (double) left + (double) right;
                 }
                 if (left instanceof String && right instanceof String) {
-                    return (String) left + (String) right;
+                    return  left + (String) right;
                 }
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
         }
-        ;
         return null;
     }
 
@@ -108,7 +117,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             case BANG:
                 return !isTruthy(right);
         }
-        ;
         return null;
     }
 
@@ -143,7 +151,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitPrintStmt(Print stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println(stringify(value));
+        log.accept(stringify(value));
         return null;
     }
 
@@ -155,8 +163,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitWhileStmt(While stmt) {
-        while (isTruthy(evaluate(stmt.condition))){
-            execute(stmt.body);
+        try{
+            while (isTruthy(evaluate(stmt.condition))){
+                execute(stmt.body);
+            }
+        }catch (BreakException ex){
+            return null;
         }
         return null;
     }
@@ -169,7 +181,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitBreakStmt(Break stmt) {
-        return null;
+         throw new BreakException();
     }
 
     private void checkNumberOperand(Token operator, Object operand) {

@@ -1,1 +1,8 @@
-print 1 < 0;
+var a = 0;
+while(true){
+    if(a == 5){
+        print a;
+        break;
+    }
+    a = a + 1;
+}
