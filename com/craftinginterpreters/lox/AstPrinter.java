@@ -1,9 +1,6 @@
 package com.craftinginterpreters.lox;
 
-import com.craftinginterpreters.lox.Expr.Assign;
-import com.craftinginterpreters.lox.Expr.Call;
-import com.craftinginterpreters.lox.Expr.Logical;
-import com.craftinginterpreters.lox.Expr.Variable;
+import com.craftinginterpreters.lox.Expr.*;
 
 import java.util.Arrays;
 
@@ -30,6 +27,11 @@ public class AstPrinter implements Expr.Visitor<String> {
     public String visitLiteralExpr(Expr.Literal expr) {
         if(expr.value == null) return "nil";
         return expr.value.toString() ;
+    }
+
+    @Override
+    public String visitLambdaExpr(Lambda expr) {
+        return null;
     }
 
     @Override

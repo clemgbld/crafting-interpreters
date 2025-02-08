@@ -8,6 +8,7 @@ abstract class Expr {
  R visitCallExpr(Call expr);
  R visitGroupingExpr(Grouping expr);
  R visitLiteralExpr(Literal expr);
+ R visitLambdaExpr(Lambda expr);
  R visitLogicalExpr(Logical expr);
  R visitUnaryExpr(Unary expr);
  R visitVariableExpr(Variable expr);
@@ -69,6 +70,18 @@ public static class Literal extends Expr {
     }
 
    final Object value;
+   }
+public static class Lambda extends Expr {
+     Lambda(Stmt.Function function) {
+      this.function = function;
+    }
+
+  @Override
+  <R> R accept(Visitor<R> visitor) {
+      return visitor.visitLambdaExpr(this);
+    }
+
+   final Stmt.Function function;
    }
 public static class Logical extends Expr {
      Logical(Expr left, Token operator, Expr right) {

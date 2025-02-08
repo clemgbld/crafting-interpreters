@@ -1,10 +1,12 @@
 package com.craftinginterpreters.lox;
 
+import com.craftinginterpreters.lox.Expr.Lambda;
 import com.craftinginterpreters.lox.Expr.Logical;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.craftinginterpreters.lox.TokenType.*;
@@ -15,8 +17,11 @@ public class Parser {
     private final List<Token> tokens;
     private int current = 0;
 
-    public Parser(List<Token> tokens) {
+    private BiConsumer<Token,String> error;
+
+    public Parser(List<Token> tokens,BiConsumer<Token,String> error) {
         this.tokens = tokens;
+        this.error = error;
     }
 
     List<Stmt> parse(){
@@ -28,7 +33,7 @@ public class Parser {
     }
     private Stmt declaration(){
         try{
-            if(match(FUN)) return function("function");
+            if(match(FUN)) return function("function",false);
             if(match(VAR)) return varDeclaration();
             return statement();
         }catch (ParseError error){
@@ -37,8 +42,11 @@ public class Parser {
         }
     }
 
-    private Stmt function(String kind) {
-        Token name = consume(IDENTIFIER, "Expect " + kind + "name.");
+    private Stmt function(String kind, boolean isLambda) {
+        Token name = null;
+        if(!isLambda){
+            name = consume(IDENTIFIER, "Expect " + kind + " name.");
+        }
         consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
         List<Token> parameters = new ArrayList<>();
         if(!check(RIGHT_PAREN)){
@@ -288,6 +296,9 @@ public class Parser {
         if(match(NUMBER,STRING)){
             return new Expr.Literal(previous().literal);
         }
+        if(match(FUN)){
+            return new Lambda((Stmt.Function) function("function",true));
+        }
         if(match(LEFT_PAREN)){
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
@@ -306,7 +317,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message){
-        Lox.error(token,message);
+        error.accept(token,message);
         return new ParseError();
     }
 

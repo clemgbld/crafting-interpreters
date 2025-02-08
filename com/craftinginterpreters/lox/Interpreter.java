@@ -1,20 +1,23 @@
 package com.craftinginterpreters.lox;
 
-import com.craftinginterpreters.lox.Expr.Assign;
-import com.craftinginterpreters.lox.Expr.Call;
-import com.craftinginterpreters.lox.Expr.Logical;
-import com.craftinginterpreters.lox.Expr.Variable;
+import com.craftinginterpreters.lox.Expr.*;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     final Environment globals = new Environment();
     private Environment environment = globals;
 
-    public Interpreter() {
+    private Consumer<String> log;
+    private Consumer<RuntimeError> logError;
+
+    public Interpreter(Consumer<String> log, Consumer<RuntimeError> logError) {
+        this.log = log;
+        this.logError = logError;
         globals.define("clock", new LoxCallable() {
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
@@ -37,7 +40,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         try {
             statements.forEach(this::execute);
         } catch (RuntimeError runtimeError) {
-            Lox.runtimeError(runtimeError);
+            logError.accept(runtimeError);
         }
     }
     private void execute(Stmt statement) {
@@ -100,12 +103,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitCallExpr(Call expr) {
-       Object calle = evaluate(expr.callee);
+       Object callee = evaluate(expr.callee);
        List<Object> arguments = new ArrayList<>();
        expr.arguments.forEach(arg -> {
            arguments.add(evaluate(arg));
        });
-       if(!(calle instanceof LoxCallable function)){
+       if(!(callee instanceof LoxCallable function)){
            throw new RuntimeError(expr.paren,"Can only call functions and classes.");
        }
         if(arguments.size() != function.arity()){
@@ -122,6 +125,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
+    }
+
+    @Override
+    public Object visitLambdaExpr(Lambda expr) {
+        return new LoxFunction(expr.function,environment);
     }
 
     @Override
@@ -186,7 +194,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitPrintStmt(Print stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println(stringify(value));
+        log.accept(stringify(value));
         return null;
     }
 
