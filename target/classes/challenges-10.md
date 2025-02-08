@@ -52,3 +52,30 @@ print a;
 How do you handle the tricky case of an anonymous function expression occurring in an expression statement:
 
 fun () {};
+
+--
+
+Implemented in Parser and Interpreter classes
+
+the trick is to report an error when there is no name in a statement but not in an expression.
+I wrapped the function statement in an expression that i called lambda.
+
+## 3
+
+Is this program valid?
+
+fun scope(a) {
+var a = "local";
+}
+In other words, are a function’s parameters in the same scope as its local variables, or in an outer scope? What does Lox do? 
+
+-- 
+
+yes they are in the same scope.
+What about other languages you are familiar with? 
+it the programming languages i'm familiar they are in the same scope but redeclaring it would cause a syntax error.
+What do you think a language should do?
+i expect the language to report a syntax error.
+
+
+

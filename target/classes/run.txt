@@ -1,2 +1,7 @@
-fun () {};
+var b = "b";
+fun scope(a) {
+var a = "local";
+}
+scope(b);
+print b;
 
