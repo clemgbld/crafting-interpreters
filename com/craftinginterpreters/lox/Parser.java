@@ -1,7 +1,6 @@
 package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.Logical;
-import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ public class Parser {
     }
     private Stmt declaration(){
         try{
+            if(match(FUN)) return function("function");
             if(match(VAR)) return varDeclaration();
             return statement();
         }catch (ParseError error){
@@ -36,6 +36,25 @@ public class Parser {
             return null;
         }
     }
+
+    private Stmt function(String kind) {
+        Token name = consume(IDENTIFIER, "Expect " + kind + "name.");
+        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+        List<Token> parameters = new ArrayList<>();
+        if(!check(RIGHT_PAREN)){
+           do{
+               if(parameters.size() >= 255){
+                   error(peek(),"Can't have more than 255 parameters.");
+               }
+               parameters.add(consume(IDENTIFIER,"Expect parameter name."));
+           }while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+        consume(LEFT_BRACE, "Expect '{' before" + kind + " body");
+        List<Stmt> body = block();
+        return new Function(name,parameters,body);
+    }
+
     private Stmt varDeclaration(){
        Token name = consume(IDENTIFIER, "Expect variable name");
        Expr initializer = null;
@@ -51,9 +70,12 @@ public class Parser {
         if(match(FOR)) return forStatement();
         if(match(IF)) return ifStatement();
         if(match(PRINT)) return printStatement();
+        if(match(RETURN)) return returnStatement();
         if(match(LEFT_BRACE)) return new Block(block());
         return expressionStatement();
     }
+
+
 
     private Stmt forStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'for'.");
@@ -147,6 +169,16 @@ public class Parser {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after value");
         return new Print(expr);
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr expr = null;
+        if(!check(SEMICOLON)){
+            expr = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after value");
+        return new Return(keyword,expr);
     }
 
     Stmt expressionStatement(){
