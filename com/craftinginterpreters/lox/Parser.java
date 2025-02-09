@@ -38,7 +38,7 @@ public class Parser {
     }
 
     private Stmt function(String kind) {
-        Token name = consume(IDENTIFIER, "Expect " + kind + "name.");
+        Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
         consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
         List<Token> parameters = new ArrayList<>();
         if(!check(RIGHT_PAREN)){
