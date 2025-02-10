@@ -7,12 +7,17 @@ import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     final Environment globals = new Environment();
     private Environment environment = globals;
+
+    private final Map<Expr,Integer> locals = new HashMap();
 
     public Interpreter() {
         globals.define("clock", new LoxCallable() {
@@ -151,13 +156,26 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(Variable expr) {
-        return environment.get(expr.name);
+        return lookupVariable(expr.name,expr);
+    }
+
+    private Object lookupVariable(Token name, Variable expr) {
+        if(locals.containsKey(expr)){
+            int depth = locals.get(expr);
+            return  environment.getAt(depth,name.lexeme);
+        }
+        return globals.get(name);
     }
 
     @Override
     public Object visitAssignExpr(Assign expr) {
         Object value = evaluate(expr.value);
-         environment.assign(expr.name,value);
+        if(locals.containsKey(expr)){
+            int depth = locals.get(expr);
+            environment.assignAt(depth,expr.name.lexeme,value);
+            return value;
+        }
+         globals.assign(expr.name,value);
          return value;
     }
 
@@ -259,6 +277,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return true;
     }
 
-    public void resolve(Expr expr, int i) {
+    public void resolve(Expr expr, int depth) {
+        locals.put(expr,depth);
     }
 }

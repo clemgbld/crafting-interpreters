@@ -2,10 +2,11 @@ package com.craftinginterpreters.lox;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 public class Environment {
-    private Environment enclosing;
-    private final Map<String,Object> values = new HashMap<>();
+    public Environment enclosing;
+    final Map<String,Object> values = new HashMap<>();
 
     public Environment() {
         this.enclosing = null;
@@ -37,5 +38,20 @@ public class Environment {
             return;
         }
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "' .");
+    }
+
+    public Object getAt(int depth, String name) {
+        return ancestors(depth).values.get(name);
+    }
+
+    public Object assignAt(int depth, String name, Object value) {
+        return ancestors(depth).values.put(name,value);
+    }
+
+    private Environment ancestors(int depth) {
+        Environment env = this;
+        return IntStream.range(0,depth)
+                .boxed()
+                .reduce(env,(environment,i) -> environment.enclosing, (a,b) -> a);
     }
 }

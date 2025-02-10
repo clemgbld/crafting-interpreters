@@ -14,6 +14,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
 
+    private FunctionType currentFunction = FunctionType.NONE;
+
     public Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
     }
@@ -91,11 +93,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     public Void visitFunctionStmt(Function stmt) {
         declare(stmt.name);
         define(stmt.name);
-        resolveFunction(stmt);
+        resolveFunction(stmt,FunctionType.FUNCTION);
         return null;
     }
 
-    private void resolveFunction(Function function) {
+    private void resolveFunction(Function function,FunctionType type) {
+        FunctionType enclosingFunction = currentFunction;
+        currentFunction = type;
         beginScope();
         function.params.forEach(param -> {
             declare(param);
@@ -103,6 +107,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         });
         resolve(function.body);
         endScope();
+        currentFunction = enclosingFunction;
     }
 
     @Override
@@ -123,6 +128,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitReturnStmt(Return stmt) {
+        if(currentFunction == FunctionType.NONE){
+            Lox.error(stmt.keyword,"Can't return from top-level code.");
+        }
+
         if(stmt.value != null){
             resolve(stmt.value);
         }
@@ -142,6 +151,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private void declare(Token name) {
        if(scopes.isEmpty()) return;
        Map<String,Boolean> scope = scopes.peek();
+       if(scope.containsKey(name.lexeme)){
+           Lox.error(name,"Already a variable with this name in this scope.");
+       }
        scope.put(name.lexeme, false);
     }
 
@@ -175,7 +187,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
 
-    private void resolve(List<Stmt> statements) {
+    public void resolve(List<Stmt> statements) {
         statements.forEach(this::resolve);
     }
 
