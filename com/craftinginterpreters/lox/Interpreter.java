@@ -258,4 +258,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if (object instanceof Boolean) return (boolean) object;
         return true;
     }
+
+    public void resolve(Expr expr, int i) {
+    }
 }
