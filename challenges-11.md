@@ -22,3 +22,32 @@ fn fib (n){
 if(n < 2) return n;
 return fib(n - 1) + fib(n - 2);
 }
+
+## 2
+
+How do other languages you know handle local variables that refer to the same name in their initializer, like:
+
+var a = "outer";
+{
+var a = a;
+}
+
+Is it a runtime error? Compile error? Allowed? Do they treat global variables differently? Do you agree with their choices? Justify your answer.
+
+in C it is allowed but the variable is initialized with itself so the result is a garbage value so it is allowed but could result in a Runtime error (undefined behavior).
+
+in Java it is not allowed and would result in a compile time error.
+
+in Javascript it depends of the syntax if you use var it will be ok because the variable will be hoisted and 
+if you use let it will result in a runtime error because the a variable will be in the temporal dead zone so you will have a runtime error.
+
+in Scheme will throw an error at runtime telling you that the variable a is unassigned.
+
+for compiled language i think Java does the right thing and for interpreted language Scheme does the right thing too.
+Because it makes no sense to assigned a variable with the same name to be initialized by another variable with the same name.
+
+
+
+
+
+
