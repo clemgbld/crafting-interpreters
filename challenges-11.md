@@ -7,7 +7,7 @@ Why is it safe to eagerly define the variable bound to a function’s name when 
 --
 
 Because as mentioned earlier in the book spliting the declaration of the variable in two steps is necessary to handle
-funny edge cases like that:
+funny edge cases like that (a variable that reference itself in its own initializer):
 
 var a = "outer";
 {
