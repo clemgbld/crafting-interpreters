@@ -34,6 +34,8 @@ var a = a;
 
 Is it a runtime error? Compile error? Allowed? Do they treat global variables differently? Do you agree with their choices? Justify your answer.
 
+--
+
 in C it is allowed but the variable is initialized with itself so the result is a garbage value so it is allowed but could result in a Runtime error (undefined behavior).
 
 in Java it is not allowed and would result in a compile time error.
@@ -42,9 +44,20 @@ in Javascript it depends of the syntax if you use var it will be ok because the 
 if you use let it will result in a runtime error because the a variable will be in the temporal dead zone so you will have a runtime error.
 
 in Scheme will throw an error at runtime telling you that the variable a is unassigned.
+but it is valid with the let syntax
+(let ((a 5))
+(let ((a a)) ; This is valid: outer `a` (5) initializes inner `a`.
+a)) ; Returns 5
 
-for compiled language i think Java does the right thing and for interpreted language Scheme does the right thing too.
-Because it makes no sense to assigned a variable with the same name to be initialized by another variable with the same name.
+i think Scheme does the right thing because with the let syntax there is not a lot of chances that you did reassigned a variable in the same name by mistake.
+
+## 3
+
+Extend the resolver to report an error if a local variable is never used.
+
+--
+
+Implemented in the Resolver class
 
 
 
