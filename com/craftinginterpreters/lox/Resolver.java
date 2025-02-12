@@ -7,17 +7,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.function.BiConsumer;
 
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     private final Interpreter interpreter;
+
+    private final BiConsumer<Token,String> logError;
     
-    private final Stack<Map<String,Boolean>> scopes = new Stack<>();
+    private final Stack<Map<String,Local>> scopes = new Stack<>();
 
     private FunctionType currentFunction = FunctionType.NONE;
 
-    public Resolver(Interpreter interpreter) {
+    public Resolver(Interpreter interpreter, BiConsumer<Token, String> logError) {
         this.interpreter = interpreter;
+        this.logError = logError;
     }
 
     @Override
@@ -60,9 +64,11 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitVariableExpr(Variable expr) {
-        if(!scopes.isEmpty() && scopes.peek().get(expr.name.lexeme) == Boolean.FALSE){
-            Lox.error(expr.name,"Can't read local variable in its own initializer.");
+        if(!scopes.isEmpty() && scopes.peek().containsKey(expr.name.lexeme) &&  scopes.peek().get(expr.name.lexeme).isDefined() == Boolean.FALSE){
+            logError.accept(expr.name,"Can't read local variable in its own initializer.");
         }
+        Local local =  scopes.peek().get(expr.name.lexeme);
+        local.use();
         resolveLocal(expr,expr.name);
         return null;
     }
@@ -129,7 +135,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     @Override
     public Void visitReturnStmt(Return stmt) {
         if(currentFunction == FunctionType.NONE){
-            Lox.error(stmt.keyword,"Can't return from top-level code.");
+            logError.accept(stmt.keyword,"Can't return from top-level code.");
         }
 
         if(stmt.value != null){
@@ -150,17 +156,18 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     private void declare(Token name) {
        if(scopes.isEmpty()) return;
-       Map<String,Boolean> scope = scopes.peek();
+       Map<String,Local> scope = scopes.peek();
        if(scope.containsKey(name.lexeme)){
-           Lox.error(name,"Already a variable with this name in this scope.");
+           logError.accept(name,"Already a variable with this name in this scope.");
        }
-       scope.put(name.lexeme, false);
+       scope.put(name.lexeme, new Local(name));
     }
 
     private void define(Token name) {
         if(scopes.isEmpty()) return;
-        Map<String,Boolean> scope = scopes.peek();
-        scope.put(name.lexeme, true);
+        Map<String,Local> scope = scopes.peek();
+        Local local = scope.get(name.lexeme);
+        local.define();
     }
 
     @Override
@@ -179,11 +186,16 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     private void endScope() {
-        scopes.pop();
+       Map<String,Local> scope =  scopes.pop();
+       scope.forEach((key, local) -> {
+          if(!local.isUsed()){
+              logError.accept(local.name,"Variable " + key + " is never read.");
+          }
+       });
     }
 
     private void beginScope() {
-        scopes.push(new HashMap<String,Boolean>());
+        scopes.push(new HashMap<>());
     }
 
 
