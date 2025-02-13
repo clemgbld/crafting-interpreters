@@ -36,6 +36,20 @@ public class ResolverTest {
     }
 
     @Test
+    public void shouldReportNotReportAnErrorWhenVariableAreUsedInAnotherScoped(){
+        Resolver resolver = new Resolver(new Interpreter(),this::logError);
+        resolver.resolve(List.of(
+                new Stmt.Block(List.of(
+                        new Stmt.Var(new Token(TokenType.IDENTIFIER,"a",null, 1), new Expr.Literal(1)),
+                        new Stmt.Block(List.of(
+                                new Print(new Variable(new Token(TokenType.IDENTIFIER,"a",null, 1)))
+                        ))
+                ))
+        ));
+        assertTrue(errors.isEmpty());
+    }
+
+    @Test
     public void shouldReportAnErrorWhenAVariableIsReassignedButNeverUsed(){
         Resolver resolver = new Resolver(new Interpreter(),this::logError);
         resolver.resolve(List.of(
@@ -51,6 +65,24 @@ public class ResolverTest {
         assertEquals("a", errors.get(0).token.lexeme);
         assertEquals(1, errors.get(0).token.line);
     }
+
+    @Test
+    public void shouldReportAnErrorWhenAVariableIsReassignedWithItselfButNeverUsed(){
+        Resolver resolver = new Resolver(new Interpreter(),this::logError);
+        resolver.resolve(List.of(
+                new Stmt.Block(List.of(
+                        new Stmt.Var(new Token(TokenType.IDENTIFIER,"a",null, 1), new Expr.Literal(1)),
+                        new Stmt.Expression(new Expr.Assign(new Token(TokenType.IDENTIFIER,"a",null, 1),new Expr.Variable(new Token(TokenType.IDENTIFIER,"a",null, 1)))),
+                        new Stmt.Var(new Token(TokenType.IDENTIFIER,"b",null, 1), new Expr.Literal(1)),
+                        new Print(new Variable(new Token(TokenType.IDENTIFIER,"b",null, 1)))
+                ))
+        ));
+        assertEquals("Variable a is never read.",errors.get(0).message);
+        assertEquals(TokenType.IDENTIFIER, errors.get(0).token.type);
+        assertEquals("a", errors.get(0).token.lexeme);
+        assertEquals(1, errors.get(0).token.line);
+    }
+
 
     @Test
     public void shouldNotReportAnError(){

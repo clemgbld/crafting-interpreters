@@ -20,6 +20,8 @@ public class Local {
         this.isUsed = true;
     }
 
+    public void unUse() { this.isUsed = false;}
+
     public boolean isDefined() {
         return isDefined;
     }

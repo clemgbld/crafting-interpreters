@@ -67,22 +67,26 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         if(!scopes.isEmpty() && scopes.peek().containsKey(expr.name.lexeme) &&  scopes.peek().get(expr.name.lexeme).isDefined() == Boolean.FALSE){
             logError.accept(expr.name,"Can't read local variable in its own initializer.");
         }
-        Local local =  scopes.peek().get(expr.name.lexeme);
-        local.use();
-        resolveLocal(expr,expr.name);
+        resolveLocal(expr,expr.name,true);
         return null;
     }
 
     @Override
     public Void visitAssignExpr(Assign expr) {
         resolve(expr.value);
-        resolveLocal(expr,expr.name);
+        resolveLocal(expr,expr.name,false);
         return null;
     }
 
-    private void resolveLocal(Expr expr, Token name) {
+    private void resolveLocal(Expr expr, Token name, boolean isread) {
         for(int i = scopes.size() - 1; i >= 0; i--){
             if(scopes.get(i).containsKey(name.lexeme)){
+                Local local = scopes.get(i).get(name.lexeme);
+                if(isread){
+                    local.use();
+                }else{
+                    local.unUse();
+                }
                 interpreter.resolve(expr,scopes.size() - 1 - i);
                 return;
             }
