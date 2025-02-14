@@ -8,8 +8,11 @@ public class Local {
 
     public Token name;
 
-    public Local(Token name) {
+    public int index;
+
+    public Local(Token name,int index) {
         this.name = name;
+        this.index = index;
     }
 
     public void define(){

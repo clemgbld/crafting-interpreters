@@ -6,7 +6,33 @@
   <component name="ChangeListManager">
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/challenges-11.md" beforeDir="false" afterPath="$PROJECT_DIR$/challenges-11.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Interpreter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Local.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Local.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/LoxFunction.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/LoxFunction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Resolver.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Resolver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/ResolverTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/ResolverTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.txt" beforeDir="false" afterPath="$PROJECT_DIR$/run.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/challenges-11.md" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/challenges-11.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Local.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Local.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/LoxFunction.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/LoxFunction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Resolver.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Resolver.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/ResolverTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/ResolverTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/run.txt" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/run.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/challenges-11.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/crafting-interpreters.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/target/classes/pom.xml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,7 +199,12 @@
       <workItem from="1739207987129" duration="3841000" />
       <workItem from="1739257277640" duration="6657000" />
       <workItem from="1739342888673" duration="3598000" />
-      <workItem from="1739429644840" duration="297000" />
+      <workItem from="1739429644840" duration="2898000" />
+      <workItem from="1739471267799" duration="464000" />
+      <workItem from="1739516237386" duration="6567000" />
+      <workItem from="1739528052159" duration="308000" />
+      <workItem from="1739531258217" duration="12304000" />
+      <workItem from="1739550722009" duration="1200000" />
     </task>
     <servers />
   </component>
@@ -182,5 +213,16 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/com/craftinginterpreters/lox/Resolver.java</url>
+          <line>195</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

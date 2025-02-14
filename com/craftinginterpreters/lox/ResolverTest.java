@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ResolverTest {
-    private List<Error> errors = new ArrayList<>();
+    private final List<Error> errors = new ArrayList<>();
 
     @Test
     public void shouldReportAnErrorWhenAVariableIsNeverUsed(){

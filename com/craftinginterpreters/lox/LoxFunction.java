@@ -2,27 +2,37 @@ package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Stmt.Function;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LoxFunction implements LoxCallable{
     private final Stmt.Function declaration;
-    private final Environment closure;
 
-    public LoxFunction(Function declaration, Environment closure) {
+    private final List<Object> closure;
+
+    public LoxFunction(Function declaration, List<Object>  closure) {
         this.declaration = declaration;
         this.closure = closure;
     }
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
-                final Environment environment = new Environment(closure);
+                if(closure != null){
+                    interpreter.localEnvironment.add(0,closure);
+                }
+
+                List<Object> localEnv = new ArrayList<>();
                 for (var i = 0; i < declaration.params.size();i++){
-                    environment.define(declaration.params.get(i).lexeme,arguments.get(i));
+                    localEnv.add(arguments.get(i));
                 }
                 try {
-                    interpreter.executeBlock(declaration.body,environment);
+                    interpreter.executeBlock(declaration.body,localEnv);
                 }catch (ReturnException ex){
                     return ex.value;
+                }finally {
+                    if(closure != null){
+                        interpreter.localEnvironment.remove(0);
+                    }
                 }
                 return null;
     }

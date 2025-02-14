@@ -10,12 +10,11 @@ import java.util.Stack;
 import java.util.function.BiConsumer;
 
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
-
     private final Interpreter interpreter;
 
     private final BiConsumer<Token,String> logError;
     
-    private final Stack<Map<String,Local>> scopes = new Stack<>();
+    private final Stack<Scope> scopes = new Stack<>();
 
     private FunctionType currentFunction = FunctionType.NONE;
 
@@ -64,7 +63,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitVariableExpr(Variable expr) {
-        if(!scopes.isEmpty() && scopes.peek().containsKey(expr.name.lexeme) &&  scopes.peek().get(expr.name.lexeme).isDefined() == Boolean.FALSE){
+        if(!scopes.isEmpty() && scopes.peek().containsKey(expr.name.lexeme) &&  scopes.peek().isDefined(expr.name.lexeme) == Boolean.FALSE){
             logError.accept(expr.name,"Can't read local variable in its own initializer.");
         }
         resolveLocal(expr,expr.name,true);
@@ -81,13 +80,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private void resolveLocal(Expr expr, Token name, boolean isread) {
         for(int i = scopes.size() - 1; i >= 0; i--){
             if(scopes.get(i).containsKey(name.lexeme)){
-                Local local = scopes.get(i).get(name.lexeme);
+                Scope scope = scopes.get(i);
                 if(isread){
-                    local.use();
+                    scope.useByName(name.lexeme);
                 }else{
-                    local.unUse();
+                    scope.unUseByName(name.lexeme);
                 }
-                interpreter.resolve(expr,scopes.size() - 1 - i);
+                interpreter.resolve(expr,scopes.size() - 1 - i, scope.getIndexByName(name.lexeme) );
                 return;
             }
         }
@@ -160,18 +159,17 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     private void declare(Token name) {
        if(scopes.isEmpty()) return;
-       Map<String,Local> scope = scopes.peek();
+       Scope scope = scopes.peek();
        if(scope.containsKey(name.lexeme)){
            logError.accept(name,"Already a variable with this name in this scope.");
        }
-       scope.put(name.lexeme, new Local(name));
+       scope.add(name);
     }
 
     private void define(Token name) {
         if(scopes.isEmpty()) return;
-        Map<String,Local> scope = scopes.peek();
-        Local local = scope.get(name.lexeme);
-        local.define();
+        Scope scope = scopes.peek();
+        scope.defineByName(name.lexeme);
     }
 
     @Override
@@ -190,16 +188,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     private void endScope() {
-       Map<String,Local> scope =  scopes.pop();
-       scope.forEach((key, local) -> {
-          if(!local.isUsed()){
-              logError.accept(local.name,"Variable " + key + " is never read.");
-          }
-       });
+       Scope scope =  scopes.pop();
+       scope.verifyIfAVariableIsUnUsed(logError);
     }
 
     private void beginScope() {
-        scopes.push(new HashMap<>());
+        scopes.push(new Scope());
     }
 
 
@@ -215,5 +209,45 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         expr.accept(this);
     }
 
+    private class Scope{
+        Map<String,Local> locales = new HashMap<>();
+        private int index = 0;
 
+        public void add(Token name){
+            locales.put(name.lexeme,new Local(name,index));
+            index++;
+        }
+
+        public int getIndexByName(String name){
+           return locales.get(name).index;
+        }
+
+        public void defineByName(String name){
+            locales.get(name).define();
+        }
+
+        public void useByName(String name){
+            locales.get(name).use();
+        }
+
+        public void unUseByName(String name){
+            locales.get(name).unUse();
+        }
+
+        public boolean containsKey(String name){
+            return locales.containsKey(name);
+        }
+
+        public boolean isDefined(String name){
+            return locales.get(name).isDefined();
+        }
+
+        public void verifyIfAVariableIsUnUsed(BiConsumer<Token, String> logError) {
+            locales.forEach((key, local) -> {
+                if(!local.isUsed()){
+                    logError.accept(local.name,"Variable " + key + " is never read.");
+                }
+            });
+        }
+    };
 }
