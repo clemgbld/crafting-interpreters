@@ -12,6 +12,7 @@ abstract class Stmt {
  R visitVarStmt(Var stmt);
  R visitWhileStmt(While stmt);
  R visitBlockStmt(Block stmt);
+ R visitClassStmt(Class stmt);
 
   }
 public static class Expression extends Stmt {
@@ -123,6 +124,20 @@ public static class Block extends Stmt {
     }
 
    final List<Stmt> statements;
+   }
+public static class Class extends Stmt {
+     Class(Token name, List<Stmt.Function> methods) {
+      this.name = name;
+      this.methods = methods;
+    }
+
+  @Override
+  <R> R accept(Visitor<R> visitor) {
+      return visitor.visitClassStmt(this);
+    }
+
+   final Token name;
+   final List<Stmt.Function> methods;
    }
 
    abstract <R> R accept(Visitor<R> visitor);

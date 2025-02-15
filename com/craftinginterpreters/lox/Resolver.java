@@ -2,6 +2,7 @@ package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.*;
 import com.craftinginterpreters.lox.Stmt.*;
+import com.craftinginterpreters.lox.Stmt.Class;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     @Override
+    public Void visitGetExpr(Get expr) {
+        resolve(expr.object);
+        return null;
+    }
+
+    @Override
     public Void visitGroupingExpr(Grouping expr) {
         resolve(expr.expression);
         return null;
@@ -49,6 +56,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     public Void visitLogicalExpr(Logical expr) {
         resolve(expr.left);
         resolve(expr.right);
+        return null;
+    }
+
+    @Override
+    public Void visitSetExpr(Set expr) {
+        resolve(expr.value);
+        resolve(expr.object);
         return null;
     }
 
@@ -175,6 +189,16 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         beginScope();
         resolve(stmt.statements);
         endScope();
+        return null;
+    }
+
+    @Override
+    public Void visitClassStmt(Class stmt) {
+        declare(stmt.name);
+        define(stmt.name);
+        stmt.methods.forEach(method -> {
+            resolveFunction(method,FunctionType.METHOD);
+        });
         return null;
     }
 
