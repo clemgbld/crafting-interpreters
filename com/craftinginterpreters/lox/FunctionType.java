@@ -1,5 +1,5 @@
 package com.craftinginterpreters.lox;
 
 public enum FunctionType {
-    NONE, METHOD, FUNCTION
+    NONE, METHOD, FUNCTION,INITIALIZER
 }

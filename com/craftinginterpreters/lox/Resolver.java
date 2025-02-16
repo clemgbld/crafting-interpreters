@@ -11,6 +11,7 @@ import java.util.Stack;
 
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
+
     private final Interpreter interpreter;
     
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
@@ -63,6 +64,15 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     public Void visitSetExpr(Set expr) {
         resolve(expr.value);
         resolve(expr.object);
+        return null;
+    }
+
+    @Override
+    public Void visitThisExpr(This expr) {
+        if(currentClass == ClassType.NONE){
+            Lox.error(expr.keyword,"Can't use 'this' outside a class.");
+        }
+        resolveLocal(expr,expr.keyword);
         return null;
     }
 
@@ -147,6 +157,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         }
 
         if(stmt.value != null){
+            if(currentFunction == FunctionType.INITIALIZER){
+                Lox.error(stmt.keyword,"Can't return a value form an initializer");
+            }
             resolve(stmt.value);
         }
         return null;
@@ -196,9 +209,21 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     public Void visitClassStmt(Class stmt) {
         declare(stmt.name);
         define(stmt.name);
-        stmt.methods.forEach(method -> {
-            resolveFunction(method,FunctionType.METHOD);
-        });
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType.CLASS;
+        beginScope();
+        scopes.peek().put("this",true);
+        stmt.methods.forEach(method ->
+                {
+                    var delcaration = FunctionType.METHOD;
+                    if(method.name.lexeme.equals("init")){
+                       delcaration = FunctionType.INITIALIZER;
+                    }
+                    resolveFunction(method,delcaration);
+                }
+        );
+        endScope();
+        currentClass = enclosingClass;
         return null;
     }
 
@@ -207,8 +232,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     private void beginScope() {
-        scopes.push(new HashMap<String,Boolean>());
+        scopes.push(new HashMap<>());
     }
+
+    private enum ClassType {
+        NONE, CLASS
+    }
+
+    private ClassType currentClass = ClassType.NONE;
 
 
     public void resolve(List<Stmt> statements) {

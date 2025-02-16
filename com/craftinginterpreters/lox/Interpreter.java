@@ -160,6 +160,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitThisExpr(This expr) {
+        return lookupVariable(expr.keyword, expr);
+    }
+
+    @Override
     public Object visitUnaryExpr(Expr.Unary expr) {
         Object right = evaluate(expr.right);
         switch (expr.operator.type) {
@@ -178,7 +183,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return lookupVariable(expr.name, expr);
     }
 
-    private Object lookupVariable(Token name, Variable expr) {
+    private Object lookupVariable(Token name, Expr expr) {
         if (locals.containsKey(expr)) {
             int depth = locals.get(expr);
             return environment.getAt(depth, name.lexeme);
@@ -206,7 +211,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitFunctionStmt(Function stmt) {
-        environment.define(stmt.name.lexeme, new LoxFunction(stmt, environment));
+        environment.define(stmt.name.lexeme, new LoxFunction(stmt, environment,false));
         return null;
     }
 
@@ -261,7 +266,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         environment.define(stmt.name.lexeme, null);
         Map<String,LoxFunction> methods = new HashMap<>();
         stmt.methods.forEach(method -> {
-            LoxFunction func = new LoxFunction(method,environment);
+            LoxFunction func = new LoxFunction(method,environment,method.name.lexeme.equals("init"));
             methods.put(method.name.lexeme,func);
         });
         LoxClass klass = new LoxClass(stmt.name.lexeme,methods);
