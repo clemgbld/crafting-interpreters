@@ -25,6 +25,7 @@ public class Environment {
             return values.get(name.lexeme);
         }
         if(enclosing != null) return enclosing.get(name);
+
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "' .");
     }
 

@@ -1,9 +1,8 @@
-class Cake {
-    taste(){
-    var adjective = "delicious";
-    print "The " + this.flavor + " cake is " + adjective + "!";
+class Math {
+    class square(n){
+        return n * n;
     }
 
 }
 
-print Cake.taste;
+print Math.square(3);
