@@ -1,6 +1,5 @@
 package com.craftinginterpreters.lox;
 
-import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.Block;
 import com.craftinginterpreters.lox.Stmt.Function;
 import com.craftinginterpreters.lox.Stmt.Print;
@@ -75,6 +74,100 @@ public class InterpreterTest {
 
        assertTrue(errors.isEmpty());
        assertEquals("9",logs.get(0));
+    }
+
+    @Test
+    public void shouldNotBeAbleToCallAStaticMethodOnAClassInstance(){
+        var ast  = List.of(
+                new Stmt.Class(new Token(TokenType.IDENTIFIER,"Math",null,1),
+                        List.of(new Function(
+                                new Token(TokenType.IDENTIFIER,"square",null,1),
+                                List.of(new Token(TokenType.IDENTIFIER,"n",null,1)),
+                                List.of(
+                                        new Block(
+                                                List.of(
+                                                        new Stmt.Return(
+                                                                new Token(TokenType.RETURN,null,null,1),
+                                                                new Expr.Binary(
+                                                                        new Expr.Variable(new Token(TokenType.IDENTIFIER,"n",null,1)),
+                                                                        new Token(TokenType.STAR,"*",null,1),
+                                                                        new Expr.Variable(new Token(TokenType.IDENTIFIER,"n",null,1))
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                ),
+                                true
+                        ))),
+                new Stmt.Var(new Token(TokenType.IDENTIFIER,"a",null,1),
+                        new Expr.Call(
+                                new Expr.Variable(new Token(TokenType.IDENTIFIER,"Math",null,1)),
+                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                List.of()
+                        )
+                        ),
+                new Print(
+                        new Expr.Call(
+                                new Expr.Get(new Expr.Variable(new Token(TokenType.IDENTIFIER,"a",null,1)),
+                                        new Token(TokenType.IDENTIFIER,"square",null,1)
+                                ),
+                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                List.of(new Expr.Literal(3.0))
+                        )
+                )
+
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logError);
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+
+        assertTrue(logs.isEmpty());
+        assertEquals("Undefined property 'square'.",errors.get(0).getMessage());
+    }
+
+    @Test
+    public void shouldNotBeAbleToCallInstanceMethodDirectlyAtTheClassLevel(){
+        var ast  = List.of(
+                new Stmt.Class(new Token(TokenType.IDENTIFIER,"Math",null,1),
+                        List.of(new Function(
+                                new Token(TokenType.IDENTIFIER,"square",null,1),
+                                List.of(new Token(TokenType.IDENTIFIER,"n",null,1)),
+                                List.of(
+                                        new Block(
+                                                List.of(
+                                                        new Stmt.Return(
+                                                                new Token(TokenType.RETURN,null,null,1),
+                                                                new Expr.Binary(
+                                                                        new Expr.Variable(new Token(TokenType.IDENTIFIER,"n",null,1)),
+                                                                        new Token(TokenType.STAR,"*",null,1),
+                                                                        new Expr.Variable(new Token(TokenType.IDENTIFIER,"n",null,1))
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                ),
+                               false
+                        ))),
+                new Print(
+                        new Expr.Call(
+                                new Expr.Get(new Expr.Variable(new Token(TokenType.IDENTIFIER,"Math",null,1)),
+                                        new Token(TokenType.IDENTIFIER,"square",null,1)
+                                ),
+                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                List.of(new Expr.Literal(3.0))
+                        )
+                )
+
+        );
+        Interpreter interpreter = new Interpreter(this::log,this::logError);
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+
+        assertTrue(logs.isEmpty());
+        assertEquals("Undefined property 'square'.",errors.get(0).getMessage());
     }
 
 

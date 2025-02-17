@@ -271,11 +271,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Void visitClassStmt(Class stmt) {
         environment.define(stmt.name.lexeme, null);
         Map<String,LoxFunction> methods = new HashMap<>();
+        Map<String,LoxFunction> staticMethods = new HashMap<>();
         stmt.methods.forEach(method -> {
             LoxFunction func =   new LoxFunction(method,environment,method.name.lexeme.equals("init"));
-            methods.put(method.name.lexeme,func);
+            if(method.isStatic){
+                staticMethods.put(method.name.lexeme,func);
+            }else{
+                methods.put(method.name.lexeme,func);
+            }
         });
-        LoxClass klass = new LoxClass(stmt.name.lexeme,methods, new LoxClass("meta" + stmt.name.lexeme, methods,null));
+        LoxClass klass = new LoxClass(stmt.name.lexeme,methods, new LoxClass("meta" + stmt.name.lexeme, staticMethods,null));
         environment.assign(stmt.name, klass);
         return null;
     }
