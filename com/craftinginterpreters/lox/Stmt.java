@@ -28,10 +28,11 @@ public static class Expression extends Stmt {
    final Expr expression;
    }
 public static class Function extends Stmt {
-     Function(Token name, List<Token> params, List<Stmt> body) {
+     Function(Token name, List<Token> params, List<Stmt> body, boolean isStatic) {
       this.name = name;
       this.params = params;
       this.body = body;
+      this.isStatic = isStatic;
     }
 
   @Override
@@ -42,6 +43,7 @@ public static class Function extends Stmt {
    final Token name;
    final List<Token> params;
    final List<Stmt> body;
+   final boolean isStatic;
    }
 public static class If extends Stmt {
      If(Expr condition, Stmt thenBranch, Stmt elseBranch) {

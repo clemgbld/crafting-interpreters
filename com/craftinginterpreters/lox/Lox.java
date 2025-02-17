@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Lox {
-    private static final Interpreter interpreter = new Interpreter();
+    private static final Interpreter interpreter = new Interpreter(System.out::println, Lox::runtimeError);
     public static boolean hadError = false;
     public static boolean hadRuntimeError = false;
     public static void main(String[] args) throws IOException {
@@ -46,7 +46,7 @@ public class Lox {
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(tokens);
+        Parser parser = new Parser(tokens, Lox::error);
         List<Stmt> statements = parser.parse();
         if(hadError) return;
         Resolver resolver = new Resolver(interpreter);

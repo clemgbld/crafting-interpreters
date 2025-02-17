@@ -6,6 +6,7 @@ import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.craftinginterpreters.lox.TokenType.*;
@@ -13,11 +14,14 @@ import static com.craftinginterpreters.lox.TokenType.*;
 public class Parser {
 
     private static class ParseError extends RuntimeException {}
+
+    private final BiConsumer<Token,String> logError;
     private final List<Token> tokens;
     private int current = 0;
 
-    public Parser(List<Token> tokens) {
+    public Parser(List<Token> tokens,BiConsumer<Token, String> logError) {
         this.tokens = tokens;
+        this.logError = logError;
     }
 
     List<Stmt> parse(){
@@ -51,6 +55,13 @@ public class Parser {
     }
 
     private Stmt.Function function(String kind) {
+        boolean isStatic = false;
+        if(match(CLASS)){
+            if(kind.equals("function")){
+               logError.accept(previous(), "Expect " + kind + " name.");
+            }
+            isStatic = true;
+        }
         Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
         consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
         List<Token> parameters = new ArrayList<>();
@@ -65,7 +76,7 @@ public class Parser {
         consume(RIGHT_PAREN, "Expect ')' after parameters.");
         consume(LEFT_BRACE, "Expect '{' before" + kind + " body");
         List<Stmt> body = block();
-        return new Function(name,parameters,body);
+        return new Function(name,parameters,body,isStatic);
     }
 
     private Stmt varDeclaration(){
@@ -326,7 +337,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message){
-        Lox.error(token,message);
+        logError.accept(token,message);
         return new ParseError();
     }
 
