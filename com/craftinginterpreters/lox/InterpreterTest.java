@@ -54,7 +54,8 @@ public class InterpreterTest {
                                                 )
                                         )
                                 ),
-                                true
+                                true,
+                                false
                         ))),
                 new Print(
                         new Expr.Call(
@@ -97,7 +98,8 @@ public class InterpreterTest {
                                                 )
                                         )
                                 ),
-                                true
+                                true,
+                                false
                         ))),
                 new Stmt.Var(new Token(TokenType.IDENTIFIER,"a",null,1),
                         new Expr.Call(
@@ -148,7 +150,8 @@ public class InterpreterTest {
                                                 )
                                         )
                                 ),
-                               false
+                               false,
+                                false
                         ))),
                 new Print(
                         new Expr.Call(
@@ -168,6 +171,86 @@ public class InterpreterTest {
 
         assertTrue(logs.isEmpty());
         assertEquals("Undefined property 'square'.",errors.get(0).getMessage());
+    }
+
+    @Test
+    public void shouldBeAbleToInterpretGetter(){
+        var ast  = List.of(
+                new Stmt.Class(new Token(TokenType.IDENTIFIER,"Circle",null,1),
+                        List.of(
+                               new Function(
+                                       new Token(TokenType.IDENTIFIER,"init",null,1),
+                                       List.of(new Token(TokenType.IDENTIFIER,"radius",null,1)),
+                                       List.of(
+                                               new Block(
+                                                       List.of(
+                                                       new Stmt.Expression(
+                                                               new Expr.Set(
+                                                                       new Expr.This(new Token(TokenType.THIS,"this",null,1)),
+                                                                       new Token(TokenType.IDENTIFIER,"radius",null,1),
+                                                                       new Expr.Variable(new Token(TokenType.IDENTIFIER,"radius",null,1))
+                                                               )
+                                                       )
+                                                       )
+                                               )
+                                       ),
+                                       false,
+                                       false
+                               ),
+                                new Function(
+                                new Token(TokenType.IDENTIFIER,"area",null,1),
+                                List.of(),
+                                List.of(
+                                        new Block(
+                                                List.of(
+                                                        new Stmt.Return(
+                                                                new Token(TokenType.RETURN,null,null,1),
+                                                                new Expr.Binary(
+
+                                                                        new Expr.Literal(3.141592653),
+                                                                        new Token(TokenType.STAR,"*",null,1),
+                                                                        new Expr.Binary(
+                                                                                new Expr.Get(
+                                                                                        new Expr.This(new Token(TokenType.THIS,"this",null,1)),
+                                                                                        new Token(TokenType.IDENTIFIER,"radius",null,1)
+                                                                                ),
+                                                                                new Token(TokenType.STAR,"*",null,1),
+                                                                                new Expr.Get(
+                                                                                        new Expr.This(new Token(TokenType.THIS,"this",null,1)),
+                                                                                        new Token(TokenType.IDENTIFIER,"radius",null,1)
+                                                                                )
+                                                                )
+
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                ),
+                                false,
+                               true
+                        ))),
+                new Stmt.Var(
+                        new Token(TokenType.IDENTIFIER,"circle",null,1),
+                        new Expr.Call(
+                               new Expr.Variable(new Token(TokenType.IDENTIFIER,"Circle",null,1)),
+                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                List.of(new Expr.Literal(4.0))
+                        )
+                ),
+                new Print(
+                                new Expr.Get(new Expr.Variable(new Token(TokenType.IDENTIFIER,"circle",null,1)),
+                                        new Token(TokenType.IDENTIFIER,"area",null,1)
+                                )
+                )
+
+        );
+        Interpreter interpreter = new Interpreter(this::log,this::logError);
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+
+        assertTrue(errors.isEmpty());
+        assertEquals("50.265482448",logs.get(0));
     }
 
 

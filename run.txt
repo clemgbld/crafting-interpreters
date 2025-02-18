@@ -1,8 +1,14 @@
-class Math {
-    class square(n){
-        return n * n;
+class Circle {
+    init(radius){
+        this.radius = radius;
+    }
+
+    area {
+        return 3.14 * this.radius * this.radius;
     }
 
 }
 
-print Math.square(3);
+var circle = Circle(4);
+
+print circle.area;

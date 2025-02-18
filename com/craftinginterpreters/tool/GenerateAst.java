@@ -29,7 +29,7 @@ public class GenerateAst {
 
         defineAst(outputDir, "Stmt", Arrays.asList(
                 "Expression : Expr expression",
-                "Function   : Token name, List<Token> params, List<Stmt> body, boolean isStatic",
+                "Function   : Token name, List<Token> params, List<Stmt> body, boolean isStatic, boolean isGetter",
                 "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
                 "Print      : Expr expression",
                 "Return     : Token keyword, Expr value",

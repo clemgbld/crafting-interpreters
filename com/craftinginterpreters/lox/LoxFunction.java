@@ -5,7 +5,7 @@ import com.craftinginterpreters.lox.Stmt.Function;
 import java.util.List;
 
 public class LoxFunction implements LoxCallable{
-    private final Stmt.Function declaration;
+    public final Stmt.Function declaration;
     private final Environment closure;
 
     private final boolean isInitializer;
@@ -37,6 +37,7 @@ public class LoxFunction implements LoxCallable{
         return declaration.params.size();
 
     }
+
 
     @Override
     public String toString(){
