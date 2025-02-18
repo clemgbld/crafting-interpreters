@@ -38,3 +38,27 @@ return 3.141592653 * this.radius * this.radius;
 var circle = Circle(4);
 print circle.area; // Prints roughly "50.2655".
 
+--
+
+implemented in Parser and Interpreter
+
+## 3
+
+Python and JavaScript allow you to freely access an object’s fields from outside of its own methods. 
+Ruby and Smalltalk encapsulate instance state. 
+Only methods on the class can access the raw fields, and it is up to the class to decide which state is exposed. 
+Most statically typed languages offer modifiers like private and public to control which parts of a class are externally accessible on a per-member basis.
+
+What are the trade-offs between these approaches and why might a language prefer one or the other?
+
+--
+
+I guess the trade-offs are that it is more work for the language designer to implement encapsulation,
+but it's a valuable feature to be able to hide your implementation details (data-structure) and be able to change them
+without affecting your consumers.
+letting the user freely access an object's field like in Javascript and Python is flexible and easy because there is not a lot of syntax to remember and it could also be more performant. 
+But it can come back to hit you
+if the consumer of your object start using some fields that you don't want to expose.
+
+
+

@@ -38,3 +38,15 @@ return 3.141592653 * this.radius * this.radius;
 var circle = Circle(4);
 print circle.area; // Prints roughly "50.2655".
 
+--
+
+implemented in Parser and Interpreter
+
+## 3
+
+Python and JavaScript allow you to freely access an object’s fields from outside of its own methods. Ruby and Smalltalk encapsulate instance state. Only methods on the class can access the raw fields, and it is up to the class to decide which state is exposed. Most statically typed languages offer modifiers like private and public to control which parts of a class are externally accessible on a per-member basis.
+
+What are the trade-offs between these approaches and why might a language prefer one or the other?
+
+
+
