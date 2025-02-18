@@ -208,12 +208,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     @Override
     public Void visitClassStmt(Class stmt) {
         declare(stmt.name);
-        stmt.methods.forEach(method ->
-                {
-
-                    resolveFunction(method,FunctionType.METHOD);
-                }
-        );
         define(stmt.name);
         ClassType enclosingClass = currentClass;
         currentClass = ClassType.CLASS;
