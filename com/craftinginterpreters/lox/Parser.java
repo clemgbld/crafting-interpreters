@@ -2,6 +2,7 @@ package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.Get;
 import com.craftinginterpreters.lox.Expr.Logical;
+import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
@@ -41,13 +42,18 @@ public class Parser {
 
     private Stmt classDeclaration() {
         Token name = consume(IDENTIFIER, "Expect class name.");
+        Expr.Variable superClass = null;
+        if(match(LESS)){
+            Token superClassName = consume(IDENTIFIER, "Expect super class name.");
+            superClass = new Expr.Variable(superClassName);
+        }
         consume(LEFT_BRACE, "Expect '{' before class body");
         List<Stmt.Function> methods = new ArrayList<>();
         while (!check(RIGHT_BRACE) && !isAtEnd()){
             methods.add(function("method"));
         }
         consume(RIGHT_BRACE, "Expect '}' after class body");
-        return new Stmt.Class(name,methods);
+        return new Stmt.Class(name,superClass,methods);
     }
 
     private Stmt.Function function(String kind) {
@@ -305,6 +311,12 @@ public class Parser {
         if(match(NIL)) return new Expr.Literal(null);
         if(match(NUMBER,STRING)){
             return new Expr.Literal(previous().literal);
+        }
+        if(match(SUPER)){
+            Token keyword = previous();
+            consume(DOT,"Expect '.' after super");
+            Token method = consume(IDENTIFIER,"Expect superclass method name");
+            return new Expr.Super(keyword,method);
         }
         if(match(LEFT_PAREN)){
             Expr expr = expression();

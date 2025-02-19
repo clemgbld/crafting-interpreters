@@ -209,8 +209,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     public Void visitClassStmt(Class stmt) {
         declare(stmt.name);
         define(stmt.name);
+        if(stmt.superClass != null && stmt.name.lexeme.equals(stmt.superClass.name.lexeme)){
+           Lox.error(stmt.superClass.name,"A class can't inherit from itself.");
+        }
         ClassType enclosingClass = currentClass;
         currentClass = ClassType.CLASS;
+        if(stmt.superClass != null){
+            resolve(stmt.superClass);
+        }
         beginScope();
         scopes.peek().put("this",true);
         stmt.methods.forEach(method ->
