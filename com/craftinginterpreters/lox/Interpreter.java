@@ -281,25 +281,28 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitClassStmt(Class stmt) {
-        Object superClass = null;
+        List<Object> superClasses = new ArrayList<>();
         if(!stmt.superClass.isEmpty()){
-            superClass = evaluate(stmt.superClass.get(0));
-            if(!(superClass instanceof LoxClass)){
-                throw new RuntimeError(stmt.superClass.get(0).name,
-                        "Superclass must be a class.");
-            }
+            stmt.superClass.forEach(c -> {
+                Object superclass = evaluate(c);
+               superClasses.add(superclass);
+                if(!(superclass instanceof LoxClass)){
+                    throw new RuntimeError(c.name,
+                            "Superclass must be a class.");
+                }
+            });
         }
         environment.define(stmt.name.lexeme, null);
         if(!stmt.superClass.isEmpty()){
             environment = new Environment(environment);
-            environment.define("super",superClass);
+            environment.define("super",superClasses.get(0));
         }
         Map<String,LoxFunction> methods = new HashMap<>();
         stmt.methods.forEach(method -> {
             LoxFunction func = new LoxFunction(method,environment,method.name.lexeme.equals("init"));
             methods.put(method.name.lexeme,func);
         });
-        LoxClass klass = new LoxClass(stmt.name.lexeme,(LoxClass) superClass,methods);
+        LoxClass klass = new LoxClass(stmt.name.lexeme,null,methods);
         if(!stmt.superClass.isEmpty()){
             environment = environment.enclosing;
         }

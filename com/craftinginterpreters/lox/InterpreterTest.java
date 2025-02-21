@@ -57,6 +57,35 @@ public class InterpreterTest {
 
     }
 
+    @Test
+    public void shouldThrowARuntimeErrorWhenTryingToInstanceAnObjectThatIsNotAClassWhenUsingInheritance(){
+        List<Stmt> ast =  List.of(
+                new Stmt.Class(
+                        new Token(TokenType.IDENTIFIER,"A",null,1),
+                        List.of(),
+                        List.of()
+                ),
+               new Stmt.Var(
+                       new Token(TokenType.IDENTIFIER,"B",null,1),
+                       new Expr.Literal(1.0)
+               ),
+                new Stmt.Class(
+                        new Token(TokenType.IDENTIFIER,"C",null,1),
+                        List.of(
+                                new Variable(new Token(TokenType.IDENTIFIER ,"A",null,1)),
+                                new Variable(new Token(TokenType.IDENTIFIER ,"B",null,2))
+                        ),
+                        List.of()
+                )
+        );
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+
+        assertEquals("Superclass must be a class.",runtimeErrors.get(0).getMessage());
+    }
+
     private void log(String message){
        logs.add(message);
     }

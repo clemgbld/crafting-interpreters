@@ -5,28 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9f0b061-4de1-4b77-ac63-2f790e02da64" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/challenges-13.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/ParserTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Interpreter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Lox.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Lox.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Parser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Resolver.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Resolver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/Stmt.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/Stmt.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/tool/GenerateAst.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/tool/GenerateAst.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Interpreter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Lox.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Lox.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Parser.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Resolver$ClassType.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Resolver$ClassType.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Resolver.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Resolver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Stmt$Class.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/lox/Stmt$Class.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/tool/GenerateAst.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/craftinginterpreters/tool/GenerateAst.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/com/craftinginterpreters/lox/InterpreterTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -217,7 +199,7 @@
       <workItem from="1739724286996" duration="2987000" />
       <workItem from="1739947694005" duration="2963000" />
       <workItem from="1740034646230" duration="2424000" />
-      <workItem from="1740122040186" duration="4227000" />
+      <workItem from="1740122040186" duration="5506000" />
     </task>
     <servers />
   </component>
