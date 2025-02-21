@@ -42,10 +42,12 @@ public class Parser {
 
     private Stmt classDeclaration() {
         Token name = consume(IDENTIFIER, "Expect class name.");
-        Expr.Variable superClass = null;
+        List<Expr.Variable> superClasses = new ArrayList<>();
         if(match(LESS)){
-            Token superClassName = consume(IDENTIFIER, "Expect super class name.");
-            superClass = new Expr.Variable(superClassName);
+            do{
+                Token superClassName = consume(IDENTIFIER, "Expect super class name.");
+                superClasses.add(new Expr.Variable(superClassName));
+            }while (match(COMMA));
         }
         consume(LEFT_BRACE, "Expect '{' before class body");
         List<Stmt.Function> methods = new ArrayList<>();
@@ -53,7 +55,7 @@ public class Parser {
             methods.add(function("method"));
         }
         consume(RIGHT_BRACE, "Expect '}' after class body");
-        return new Stmt.Class(name,superClass,methods);
+        return new Stmt.Class(name,superClasses,methods);
     }
 
     private Stmt.Function function(String kind) {

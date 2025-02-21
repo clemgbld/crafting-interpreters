@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
+import java.util.function.Consumer;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -17,7 +17,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private final Map<Expr, Integer> locals = new HashMap<>();
 
-    public Interpreter() {
+    private final Consumer<String> log;
+
+    private final Consumer<RuntimeError> logError;
+
+    public Interpreter(Consumer<String> log, Consumer<RuntimeError> logError) {
+        this.log = log;
+        this.logError = logError;
         globals.define("clock", new LoxCallable() {
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
@@ -40,7 +46,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         try {
             statements.forEach(this::execute);
         } catch (RuntimeError runtimeError) {
-            Lox.runtimeError(runtimeError);
+            logError.accept(runtimeError);
         }
     }
 
@@ -240,7 +246,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitPrintStmt(Print stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println(stringify(value));
+        log.accept(stringify(value));
         return null;
     }
 
@@ -276,15 +282,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitClassStmt(Class stmt) {
         Object superClass = null;
-        if(stmt.superClass != null){
-            superClass = evaluate(stmt.superClass);
+        if(!stmt.superClass.isEmpty()){
+            superClass = evaluate(stmt.superClass.get(0));
             if(!(superClass instanceof LoxClass)){
-                throw new RuntimeError(stmt.superClass.name,
+                throw new RuntimeError(stmt.superClass.get(0).name,
                         "Superclass must be a class.");
             }
         }
         environment.define(stmt.name.lexeme, null);
-        if(stmt.superClass != null){
+        if(!stmt.superClass.isEmpty()){
             environment = new Environment(environment);
             environment.define("super",superClass);
         }
@@ -294,7 +300,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             methods.put(method.name.lexeme,func);
         });
         LoxClass klass = new LoxClass(stmt.name.lexeme,(LoxClass) superClass,methods);
-        if(stmt.superClass != null){
+        if(!stmt.superClass.isEmpty()){
             environment = environment.enclosing;
         }
         environment.assign(stmt.name, klass);

@@ -126,7 +126,7 @@ public static class Block extends Stmt {
    final List<Stmt> statements;
    }
 public static class Class extends Stmt {
-     Class(Token name, Expr.Variable superClass, List<Stmt.Function> methods) {
+     Class(Token name, List<Expr.Variable> superClass, List<Stmt.Function> methods) {
       this.name = name;
       this.superClass = superClass;
       this.methods = methods;
@@ -138,7 +138,7 @@ public static class Class extends Stmt {
     }
 
    final Token name;
-   final Expr.Variable superClass;
+   final List<Expr.Variable> superClass;
    final List<Stmt.Function> methods;
    }
 
