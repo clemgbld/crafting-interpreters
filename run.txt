@@ -4,11 +4,15 @@ class Doughnut {
     }
 }
 
-class BostonCream < Doughnut {
-     cook(){
-          super.cook();
-          print "Pipe full of custard and coat with chocolate";
-     }
+class Cookie {
+    bake(){
+        print "Fry cookie";
+    }
 }
 
-BostonCream().cook();
+class BostonCream < Doughnut , Cookie {}
+
+var ines = BostonCream();
+
+ines.cook();
+ines.bake();
