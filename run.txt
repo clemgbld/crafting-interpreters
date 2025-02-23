@@ -4,15 +4,22 @@ class Doughnut {
     }
 }
 
-class Cookie {
-    bake(){
-        print "Fry cookie";
-    }
+
+class BostonCream < Doughnut {
+     cook(){
+          super.cook();
+          print "Pipe full of custard and coat with chocolate";
+     }
 }
 
-class BostonCream < Doughnut , Cookie {}
 
-var ines = BostonCream();
+class MasterChief < BostonCream  {
+        cook () {
+            super.cook();
+        }
+}
 
-ines.cook();
-ines.bake();
+
+
+
+MasterChief().cook();

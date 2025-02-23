@@ -168,6 +168,186 @@ public class InterpreterTest {
         assertEquals(List.of("1","2"),logs);
     }
 
+
+    @Test
+    public void shouldBeAbleToUseSuperForMultipleSuperclasses(){
+        List<Stmt> ast =  List.of(
+                new Stmt.Class(
+                        new Token(TokenType.IDENTIFIER,"A",null,1),
+                        List.of(),
+                        List.of(
+                                new Function(new Token(TokenType.IDENTIFIER,"a",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("1"))
+                                                        )
+                                                )
+                                        ))
+                        )
+                ),
+                new Stmt.Class(
+                        new Token(TokenType.IDENTIFIER,"B",null,1),
+                        List.of(),
+                        List.of(
+                                new Function(new Token(TokenType.IDENTIFIER,"b",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("2"))
+                                                        )
+                                                )
+                                        ))
+                        )
+                ),
+                new Stmt.Class(
+                        new Token(TokenType.IDENTIFIER,"C",null,1),
+                        List.of(
+                                new Variable(new Token(TokenType.IDENTIFIER ,"A",null,1)),
+                                new Variable(new Token(TokenType.IDENTIFIER ,"B",null,2))
+                        ),
+                        List.of(
+                                new Function(new Token(TokenType.IDENTIFIER,"call",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Stmt.Expression(
+                                                                        new Call(
+                                                                                new Expr.Super(
+                                                                                        new Token(TokenType.SUPER,"super",null,1),
+                                                                                        new Token(TokenType.IDENTIFIER,"a",null,1)
+                                                                                ),
+                                                                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                                               List.of()
+                                                                        )
+                                                                ),
+                                                                new Stmt.Expression(
+                                                                        new Call(new Expr.Super(
+                                                                                        new Token(TokenType.SUPER,"super",null,1),
+                                                                                        new Token(TokenType.IDENTIFIER,"b",null,1)
+                                                                                ),
+                                                                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                                                List.of()
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                        ))
+                        )
+                ),
+                new Stmt.Var(
+                        new Token(TokenType.IDENTIFIER,"c",null,1),
+                        new Call(new Expr.Variable(new Token(TokenType.IDENTIFIER,"C",null,1)),
+                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                List.of()
+                        )
+                ),
+                new Stmt.Expression(
+                        new Call(new Expr.Get(
+                                new Expr.Variable(new Token(TokenType.IDENTIFIER,"c",null,1)),
+                                new Token(TokenType.IDENTIFIER,"call",null,1)
+                        ),
+                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                List.of()
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+
+        assertTrue(errors.isEmpty());
+        assertTrue(runtimeErrors.isEmpty());
+        assertEquals(List.of("1","2"),logs);
+    }
+
+    @Test
+    public void shouldBeAbleToUseSuperOnMultipleInheritanceLevel(){
+        List<Stmt> ast =  List.of(
+                new Stmt.Class(
+                        new Token(TokenType.IDENTIFIER,"A",null,1),
+                        List.of(),
+                        List.of(
+                                new Function(new Token(TokenType.IDENTIFIER,"a",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("1"))
+                                                        )
+                                                )
+                                        ))
+                        )
+                ),
+                new Stmt.Class(
+                        new Token(TokenType.IDENTIFIER,"B",null,1),
+                        List.of(
+                                new Variable(new Token(TokenType.IDENTIFIER ,"A",null,1))
+                        ),
+                        List.of(
+                        )
+                ),
+                new Stmt.Class(
+                        new Token(TokenType.IDENTIFIER,"C",null,1),
+                        List.of(
+                                new Variable(new Token(TokenType.IDENTIFIER ,"B",null,2))
+                        ),
+                        List.of(
+                                new Function(new Token(TokenType.IDENTIFIER,"call",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Stmt.Expression(
+                                                                        new Call(
+                                                                                new Expr.Super(
+                                                                                        new Token(TokenType.SUPER,"super",null,1),
+                                                                                        new Token(TokenType.IDENTIFIER,"a",null,1)
+                                                                                ),
+                                                                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                                                List.of()
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                        ))
+                        )
+                ),
+                new Stmt.Var(
+                        new Token(TokenType.IDENTIFIER,"c",null,1),
+                        new Call(new Expr.Variable(new Token(TokenType.IDENTIFIER,"C",null,1)),
+                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                List.of()
+                        )
+                ),
+                new Stmt.Expression(
+                        new Call(new Expr.Get(
+                                new Expr.Variable(new Token(TokenType.IDENTIFIER,"c",null,1)),
+                                new Token(TokenType.IDENTIFIER,"call",null,1)
+                        ),
+                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                List.of()
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+
+        assertTrue(errors.isEmpty());
+        assertTrue(runtimeErrors.isEmpty());
+        assertEquals(List.of("1","2"),logs);
+    }
+
+
+
     private void log(String message){
        logs.add(message);
     }

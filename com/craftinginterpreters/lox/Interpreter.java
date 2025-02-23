@@ -1,14 +1,13 @@
 package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.*;
+import com.craftinginterpreters.lox.Expr.Set;
 import com.craftinginterpreters.lox.Stmt.*;
 import com.craftinginterpreters.lox.Stmt.Class;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -294,9 +293,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             });
         }
         environment.define(stmt.name.lexeme, null);
+        Environment env = new Environment(environment);
         if(!stmt.superClass.isEmpty()){
-            environment = new Environment(environment);
-            environment.define("super",superClasses.get(0));
+            env.define("super",
+                  new LoxClass("x", superClasses,
+                          stmt.methods.stream()
+                                  .collect(Collectors.toMap(
+                                          method -> method.name.lexeme,
+                                          method -> new LoxFunction(method, environment.enclosing, method.name.lexeme.equals("init")) // Value: LoxFunction
+                                  ))
+                    ));
         }
         Map<String,LoxFunction> methods = new HashMap<>();
         stmt.methods.forEach(method -> {
