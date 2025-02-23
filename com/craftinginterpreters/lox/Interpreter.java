@@ -167,9 +167,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitSuperExpr(Super expr) {
         int distance = locals.get(expr);
-        LoxClass superclass = (LoxClass) environment.getAt(distance,"super");
+        @SuppressWarnings("unchecked")
+        List<LoxClass> superclasses = (List<LoxClass>) environment.getAt(distance,"super");
         LoxInstance object = (LoxInstance) environment.getAt(distance - 1,"this");
-        LoxFunction method = superclass.findMethod(expr.method.lexeme);
+        LoxFunction method = superclasses.stream()
+                .filter(c -> Objects.nonNull(c.findMethod(expr.method.lexeme)))
+                .findFirst().map(c -> c.findMethod(expr.method.lexeme))
+                .orElse(null);
         if(method == null){
             throw new RuntimeError(expr.method,"Undefined property " + "'" + expr.method.lexeme + "'.");
         }
@@ -293,16 +297,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             });
         }
         environment.define(stmt.name.lexeme, null);
-        Environment env = new Environment(environment);
         if(!stmt.superClass.isEmpty()){
-            env.define("super",
-                  new LoxClass("x", superClasses,
-                          stmt.methods.stream()
-                                  .collect(Collectors.toMap(
-                                          method -> method.name.lexeme,
-                                          method -> new LoxFunction(method, environment.enclosing, method.name.lexeme.equals("init")) // Value: LoxFunction
-                                  ))
-                    ));
+            environment = new Environment(environment);
+            environment.define("super",
+                  superClasses);
         }
         Map<String,LoxFunction> methods = new HashMap<>();
         stmt.methods.forEach(method -> {

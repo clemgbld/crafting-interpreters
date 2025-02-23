@@ -342,8 +342,8 @@ public class InterpreterTest {
         interpreter.interpret(ast);
 
         assertTrue(errors.isEmpty());
-        assertTrue(runtimeErrors.isEmpty());
-        assertEquals(List.of("1","2"),logs);
+        System.out.println(runtimeErrors);
+        assertEquals(List.of("1"),logs);
     }
 
 

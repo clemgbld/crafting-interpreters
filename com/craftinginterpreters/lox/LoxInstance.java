@@ -7,7 +7,7 @@ public class LoxInstance {
 
     private final Map<String, Object> fields = new HashMap<>();
 
-    private final LoxClass klass;
+    public final LoxClass klass;
 
     public LoxInstance(LoxClass klass) {
         this.klass = klass;
