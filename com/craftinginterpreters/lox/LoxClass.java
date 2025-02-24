@@ -49,4 +49,8 @@ public class LoxClass implements LoxCallable {
 
         return null;
     }
+
+    public LoxFunction findInnerMethod(String name){
+        return methods.get(name);
+    }
 }

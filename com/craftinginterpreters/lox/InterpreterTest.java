@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class InterpreterTest {
     private final List<RuntimeError> runtimeErrors = new ArrayList<>();
@@ -82,6 +83,82 @@ public class InterpreterTest {
         resolver.resolve(ast);
         interpreter.interpret(ast);
         assertEquals(List.of("cook super"),logs);
+    }
+
+    @Test
+    public void shouldCallTheMethodWithTheSameNameInTheSubclassWhenUsingInner(){
+        List<Stmt> ast = List.of(
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"A",null,1),
+                        null,
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                               new Stmt.Expression(
+                                                                       new Call(
+                                                                               new Expr.Inner(new Token(TokenType.INNER, "inner",null,1)),
+                                                                               new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                                               List.of()
+                                                                       )
+                                                               )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"B",null,1),
+                        new Variable(new Token(TokenType.IDENTIFIER,"A",null,1)),
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("cook sub"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Var(
+                        new Token(TokenType.IDENTIFIER,"b",null,1),
+                        new Call(
+                                new Variable(
+                                        new Token(TokenType.IDENTIFIER,"B",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                ),
+                new Stmt.Expression(
+                        new Call(
+                                new Expr.Get(
+                                        new Variable(new Token(TokenType.IDENTIFIER,"b",null,1)),
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertTrue(runtimeErrors.isEmpty());
+        assertTrue(errors.isEmpty());
+        assertEquals(List.of("cook sub"),logs);
     }
 
     private void log(String message){

@@ -83,6 +83,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitInnerExpr(Inner expr) {
+        resolveLocal(expr,expr.keyword);
         return null;
     }
 
@@ -237,10 +238,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
             currentClass = ClassType.SUBCLASS;
             resolve(stmt.superClass);
         }
-        if(stmt.superClass != null){
             beginScope();
-            scopes.peek().put("super",true);
-        }
+            scopes.peek().put("inner",true);
         beginScope();
         scopes.peek().put("this",true);
         stmt.methods.forEach(method ->
@@ -253,8 +252,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
                 }
         );
         endScope();
-
-        if(stmt.superClass != null) endScope();
+        endScope();
         currentClass = enclosingClass;
         return null;
     }
