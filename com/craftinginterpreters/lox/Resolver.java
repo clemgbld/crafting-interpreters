@@ -8,16 +8,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.function.BiConsumer;
 
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private final Interpreter interpreter;
+
+    private final BiConsumer<Token,String> logError;
     
     private final Stack<Map<String,Boolean>> scopes = new Stack<>();
 
     private FunctionType currentFunction = FunctionType.NONE;
 
-    public Resolver(Interpreter interpreter) {
+
+    public Resolver(Interpreter interpreter, BiConsumer<Token, String> logError) {
         this.interpreter = interpreter;
+        this.logError = logError;
     }
 
     @Override
@@ -68,18 +73,23 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     @Override
     public Void visitSuperExpr(Super expr) {
         if(currentClass == ClassType.NONE){
-            Lox.error(expr.keyword,"Can't use 'super' outside of a class.");
+            logError.accept(expr.keyword,"Can't use 'super' outside of a class.");
         }else if(currentClass != ClassType.SUBCLASS){
-           Lox.error(expr.keyword,"Can't use 'super' in a class with no superclass.");
+           logError.accept(expr.keyword,"Can't use 'super' in a class with no superclass.");
         }
         resolveLocal(expr,expr.keyword);
         return null;
     }
 
     @Override
+    public Void visitInnerExpr(Inner expr) {
+        return null;
+    }
+
+    @Override
     public Void visitThisExpr(This expr) {
         if(currentClass == ClassType.NONE){
-            Lox.error(expr.keyword,"Can't use 'this' outside a class.");
+            logError.accept(expr.keyword,"Can't use 'this' outside a class.");
         }
         resolveLocal(expr,expr.keyword);
         return null;
@@ -94,7 +104,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     @Override
     public Void visitVariableExpr(Variable expr) {
         if(!scopes.isEmpty() && scopes.peek().get(expr.name.lexeme) == Boolean.FALSE){
-            Lox.error(expr.name,"Can't read local variable in its own initializer.");
+            logError.accept(expr.name,"Can't read local variable in its own initializer.");
         }
         resolveLocal(expr,expr.name);
         return null;
@@ -162,12 +172,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     @Override
     public Void visitReturnStmt(Return stmt) {
         if(currentFunction == FunctionType.NONE){
-            Lox.error(stmt.keyword,"Can't return from top-level code.");
+            logError.accept(stmt.keyword,"Can't return from top-level code.");
         }
 
         if(stmt.value != null){
             if(currentFunction == FunctionType.INITIALIZER){
-                Lox.error(stmt.keyword,"Can't return a value form an initializer");
+                logError.accept(stmt.keyword,"Can't return a value form an initializer");
             }
             resolve(stmt.value);
         }
@@ -188,7 +198,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
        if(scopes.isEmpty()) return;
        Map<String,Boolean> scope = scopes.peek();
        if(scope.containsKey(name.lexeme)){
-           Lox.error(name,"Already a variable with this name in this scope.");
+           logError.accept(name,"Already a variable with this name in this scope.");
        }
        scope.put(name.lexeme, false);
     }
@@ -219,7 +229,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         declare(stmt.name);
         define(stmt.name);
         if(stmt.superClass != null && stmt.name.lexeme.equals(stmt.superClass.name.lexeme)){
-           Lox.error(stmt.superClass.name,"A class can't inherit from itself.");
+           logError.accept(stmt.superClass.name,"A class can't inherit from itself.");
         }
         ClassType enclosingClass = currentClass;
         currentClass = ClassType.CLASS;

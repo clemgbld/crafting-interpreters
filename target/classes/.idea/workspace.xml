@@ -77,7 +77,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="JUnit.InterpreterTest">
+  <component name="RunManager" selected="Application.GenerateAst">
     <configuration name="AstPrinter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.AstPrinter" />
       <module name="crafting-interpreters" />
@@ -126,24 +126,8 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="InterpreterTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="crafting-interpreters" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.craftinginterpreters.lox.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.craftinginterpreters.lox" />
-      <option name="MAIN_CLASS_NAME" value="com.craftinginterpreters.lox.InterpreterTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.InterpreterTest" />
         <item itemvalue="Application.Lox" />
         <item itemvalue="Application.AstPrinter" />
         <item itemvalue="Application.Main" />
