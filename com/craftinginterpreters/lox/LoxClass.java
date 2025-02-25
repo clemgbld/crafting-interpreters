@@ -52,6 +52,7 @@ public class LoxClass implements LoxCallable {
     }
 
     public LoxFunction findInnerMethod(String name){
+        if(this.subClass == null) return null;
         if(subClass.methods.containsKey(name)){
             return subClass.methods.get(name);
         }
@@ -60,6 +61,7 @@ public class LoxClass implements LoxCallable {
 
 
     public LoxClass findSuperClassByName(String className) {
+        if (this.superClass == null) return null;
         if(this.superClass.name.equals(className) ) return this.superClass;
         return this.superClass.findSuperClassByName(className);
     }

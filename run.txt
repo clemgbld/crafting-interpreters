@@ -19,4 +19,4 @@ class BostonCream < Cookie {
   }
 }
 
-BostonCream().cook();
+Doughnut().cook();

@@ -71,18 +71,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     @Override
-    public Void visitSuperExpr(Super expr) {
-        if(currentClass == ClassType.NONE){
-            logError.accept(expr.keyword,"Can't use 'super' outside of a class.");
-        }else if(currentClass != ClassType.SUBCLASS){
-           logError.accept(expr.keyword,"Can't use 'super' in a class with no superclass.");
-        }
-        resolveLocal(expr,expr.keyword);
-        return null;
-    }
-
-    @Override
     public Void visitInnerExpr(Inner expr) {
+        if(currentClass == ClassType.NONE){
+            logError.accept(expr.keyword,"Can't use 'inner' outside of a class.");
+        }
         resolveLocal(expr,expr.keyword);
         return null;
     }
@@ -234,10 +226,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         }
         ClassType enclosingClass = currentClass;
         currentClass = ClassType.CLASS;
-        if(stmt.superClass != null){
-            currentClass = ClassType.SUBCLASS;
-            resolve(stmt.superClass);
-        }
             beginScope();
             scopes.peek().put("inner",true);
         beginScope();
@@ -266,7 +254,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     private enum ClassType {
-        NONE, CLASS,SUBCLASS
+        NONE, CLASS
     }
 
     private ClassType currentClass = ClassType.NONE;

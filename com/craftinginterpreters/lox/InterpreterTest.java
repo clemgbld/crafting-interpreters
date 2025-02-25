@@ -2,9 +2,8 @@ package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.Call;
 import com.craftinginterpreters.lox.Expr.Variable;
+import com.craftinginterpreters.lox.Stmt.*;
 import com.craftinginterpreters.lox.Stmt.Class;
-import com.craftinginterpreters.lox.Stmt.Print;
-import com.craftinginterpreters.lox.Stmt.Var;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -345,6 +344,197 @@ public class InterpreterTest {
         assertTrue(runtimeErrors.isEmpty());
         assertTrue(errors.isEmpty());
         assertEquals(List.of("cook sub"),logs);
+    }
+
+    @Test
+    public void shouldDoNothingWhenThereIsNoSubClassesWithTheDesiredInnerMethod(){
+        List<Stmt> ast = List.of(
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"A",null,1),
+                        null,
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Stmt.Expression(
+                                                                        new Call(
+                                                                                new Expr.Inner(new Token(TokenType.INNER, "inner",null,1)),
+                                                                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                                                List.of()
+                                                                        )
+                                                                ),
+                                                                new Print(new Expr.Literal("log"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Var(
+                        new Token(TokenType.IDENTIFIER,"a",null,1),
+                        new Call(
+                                new Variable(
+                                        new Token(TokenType.IDENTIFIER,"A",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                ),
+                new Stmt.Expression(
+                        new Call(
+                                new Expr.Get(
+                                        new Variable(new Token(TokenType.IDENTIFIER,"a",null,1)),
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertTrue(runtimeErrors.isEmpty());
+        assertTrue(errors.isEmpty());
+        assertEquals(List.of("log"),logs);
+    }
+
+    @Test
+    public void shouldDoNothingWhenCallingInnerOnAClassThatHasNoSubClasses(){
+        List<Stmt> ast = List.of(
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"A",null,1),
+                        null,
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Stmt.Expression(
+                                                                        new Call(
+                                                                                new Expr.Inner(new Token(TokenType.INNER, "inner",null,1)),
+                                                                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                                                List.of()
+                                                                        )
+                                                                ),
+                                                                new Print(new Expr.Literal("log"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"B",null,1),
+                        new Variable(new Token(TokenType.IDENTIFIER,"A",null,1)),
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"v",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("bark sub"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"C",null,1),
+                        new Variable(new Token(TokenType.IDENTIFIER,"B",null,1)),
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"bark",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("cook sub"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Var(
+                        new Token(TokenType.IDENTIFIER,"c",null,1),
+                        new Call(
+                                new Variable(
+                                        new Token(TokenType.IDENTIFIER,"C",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                ),
+                new Stmt.Expression(
+                        new Call(
+                                new Expr.Get(
+                                        new Variable(new Token(TokenType.IDENTIFIER,"c",null,1)),
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertTrue(runtimeErrors.isEmpty());
+        assertTrue(errors.isEmpty());
+        assertEquals(List.of("log"),logs);
+    }
+
+    @Test
+    public void shouldNotUseInnerOutsideAClass(){
+        List<Stmt> ast = List.of(
+               new Function(
+                       new Token(TokenType.IDENTIFIER,"x",null,1),
+                       List.of(),
+                       List.of(
+                               new Block(List.of(
+                                       new Stmt.Expression(
+                                               new Call(
+                                                       new Expr.Inner(new Token(TokenType.INNER, "inner",null,1)),
+                                                       new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                       List.of()
+                                               )
+                                       )
+                               ))
+                       )
+               ),
+                new Stmt.Expression(
+                        new Call(
+                                new Variable(
+                                        new Token(TokenType.IDENTIFIER,"x",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        assertEquals(TokenType.INNER,errors.get(0).name.type);
+        assertEquals("Can't use 'inner' outside of a class.",errors.get(0).message);
     }
 
 
