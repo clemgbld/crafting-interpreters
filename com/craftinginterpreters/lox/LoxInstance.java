@@ -7,7 +7,7 @@ public class LoxInstance {
 
     private final Map<String, Object> fields = new HashMap<>();
 
-    private final LoxClass klass;
+    public final LoxClass klass;
 
     public LoxInstance(LoxClass klass) {
         this.klass = klass;
@@ -29,11 +29,8 @@ public class LoxInstance {
         throw new RuntimeError(name,"Undefined property '" + name.lexeme + "'.");
     }
 
-    public Object getInner(Token name){
-        return klass.findInnerMethod(name.lexeme);
-    }
-
     public void set(Token name, Object value){
         fields.put(name.lexeme,value);
     }
+
 }

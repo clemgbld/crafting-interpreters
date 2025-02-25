@@ -7,8 +7,9 @@ public class LoxClass implements LoxCallable {
     private final Map<String, LoxFunction> methods;
     final String name;
 
-    private final LoxClass superClass;
+    public final LoxClass superClass;
 
+    public LoxClass subClass;
 
     public LoxClass(String name, LoxClass superClass ,Map<String, LoxFunction> methods) {
         this.name = name;
@@ -51,6 +52,19 @@ public class LoxClass implements LoxCallable {
     }
 
     public LoxFunction findInnerMethod(String name){
-        return methods.get(name);
+        if(subClass.methods.containsKey(name)){
+            return subClass.methods.get(name);
+        }
+        return subClass.findInnerMethod(name);
+    }
+
+
+    public LoxClass findSuperClassByName(String className) {
+        if(this.superClass.name.equals(className) ) return this.superClass;
+        return this.superClass.findSuperClassByName(className);
+    }
+
+    public void setSubClass(LoxClass subClass) {
+        this.subClass = subClass;
     }
 }

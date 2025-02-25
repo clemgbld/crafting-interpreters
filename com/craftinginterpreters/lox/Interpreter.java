@@ -180,9 +180,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitInnerExpr(Inner expr) {
         int distance = locals.get(expr);
-        Token innerMethodName = (Token) environment.getAt(distance,"inner");
+        MethodInfo methodInfo = (MethodInfo) environment.getAt(distance,"inner");
         LoxInstance object = (LoxInstance) environment.getAt(distance - 1,"this");
-        return object.getInner(innerMethodName);
+         LoxClass superClass = object.klass.findSuperClassByName(methodInfo.className());
+         LoxFunction innerMethod = superClass.findInnerMethod(methodInfo.name().lexeme);
+        return innerMethod.bind(object);
     }
 
     @Override
@@ -301,12 +303,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Map<String,LoxFunction> methods = new HashMap<>();
         stmt.methods.forEach(method -> {
             environment = new Environment(environment);
-            environment.define("inner",method.name);
+            environment.define("inner", new MethodInfo(method.name,stmt.name.lexeme));
             LoxFunction func = new LoxFunction(method,environment,method.name.lexeme.equals("init"));
             methods.put(method.name.lexeme,func);
-            environment = environment.enclosing;
         });
         LoxClass klass = new LoxClass(stmt.name.lexeme,(LoxClass) superClass,methods);
+        environment = environment.enclosing;
+        if(superClass != null){
+            ((LoxClass) superClass).setSubClass(klass);
+        }
         environment.assign(stmt.name, klass);
         return null;
     }

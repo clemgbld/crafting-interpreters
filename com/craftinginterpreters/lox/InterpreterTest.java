@@ -161,6 +161,194 @@ public class InterpreterTest {
         assertEquals(List.of("cook sub"),logs);
     }
 
+    @Test
+    public void shouldSelectTheCorrectSubClassWhenUsingInnerOnAMultipleLevelInheritance(){
+        List<Stmt> ast = List.of(
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"A",null,1),
+                        null,
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Stmt.Expression(
+                                                                        new Call(
+                                                                                new Expr.Inner(new Token(TokenType.INNER, "inner",null,1)),
+                                                                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                                                List.of()
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"B",null,1),
+                        new Variable(new Token(TokenType.IDENTIFIER,"A",null,1)),
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("cook sub"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"C",null,1),
+                        new Variable(new Token(TokenType.IDENTIFIER,"B",null,1)),
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("cook sub sub"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Var(
+                        new Token(TokenType.IDENTIFIER,"c",null,1),
+                        new Call(
+                                new Variable(
+                                        new Token(TokenType.IDENTIFIER,"C",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                ),
+                new Stmt.Expression(
+                        new Call(
+                                new Expr.Get(
+                                        new Variable(new Token(TokenType.IDENTIFIER,"c",null,1)),
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertTrue(runtimeErrors.isEmpty());
+        assertTrue(errors.isEmpty());
+        assertEquals(List.of("cook sub"),logs);
+    }
+
+    @Test
+    public void shouldGoToTheNextSubClassIfTheMethodIsNotFoundInTheNearestSubClass(){
+        List<Stmt> ast = List.of(
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"A",null,1),
+                        null,
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Stmt.Expression(
+                                                                        new Call(
+                                                                                new Expr.Inner(new Token(TokenType.INNER, "inner",null,1)),
+                                                                                new Token(TokenType.LEFT_PAREN,null,null,1),
+                                                                                List.of()
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"B",null,1),
+                        new Variable(new Token(TokenType.IDENTIFIER,"A",null,1)),
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"bark",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("bark sub"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Class(
+                        new Token(TokenType.IDENTIFIER,"C",null,1),
+                        new Variable(new Token(TokenType.IDENTIFIER,"B",null,1)),
+                        List.of(
+                                new Stmt.Function(
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1),
+                                        List.of(),
+                                        List.of(
+                                                new Stmt.Block(
+                                                        List.of(
+                                                                new Print(new Expr.Literal("cook sub"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                ),
+                new Var(
+                        new Token(TokenType.IDENTIFIER,"c",null,1),
+                        new Call(
+                                new Variable(
+                                        new Token(TokenType.IDENTIFIER,"C",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                ),
+                new Stmt.Expression(
+                        new Call(
+                                new Expr.Get(
+                                        new Variable(new Token(TokenType.IDENTIFIER,"c",null,1)),
+                                        new Token(TokenType.IDENTIFIER,"cook",null,1)
+                                ),
+
+                                new Token(TokenType.IDENTIFIER,null,null,1),
+                                List.of()
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertTrue(runtimeErrors.isEmpty());
+        assertTrue(errors.isEmpty());
+        assertEquals(List.of("cook sub"),logs);
+    }
+
+
+
     private void log(String message){
         logs.add(message);
     }

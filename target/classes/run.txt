@@ -1,14 +1,22 @@
 class Doughnut {
-    cook(){
-        print "Fry until golden brown";
+  cook() {
+    print "Fry until golden brown.";
+    inner();
+    print "Place in a nice box.";
+  }
+}
+
+class Cookie < Doughnut {
+    cook() {
+        print "Cookie monster.";
+        inner();
     }
 }
 
-class BostonCream < Doughnut {
-     cook(){
-          super.cook();
-          print "Pipe full of custard and coat with chocolate";
-     }
+class BostonCream < Cookie {
+  cook() {
+    print "Pipe full of custard and coat with chocolate.";
+  }
 }
 
 BostonCream().cook();
