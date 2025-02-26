@@ -16,6 +16,7 @@ abstract class Expr {
  R visitUnaryExpr(Unary expr);
  R visitVariableExpr(Variable expr);
  R visitAssignExpr(Assign expr);
+ R visitLoxListExpr(LoxList expr);
 
   }
 public static class Binary extends Expr {
@@ -183,6 +184,18 @@ public static class Assign extends Expr {
 
    final Token name;
    final Expr value;
+   }
+public static class LoxList extends Expr {
+     LoxList(List<Expr> exprs) {
+      this.exprs = exprs;
+    }
+
+  @Override
+  <R> R accept(Visitor<R> visitor) {
+      return visitor.visitLoxListExpr(this);
+    }
+
+   final List<Expr> exprs;
    }
 
    abstract <R> R accept(Visitor<R> visitor);

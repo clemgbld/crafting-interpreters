@@ -25,7 +25,8 @@ public class GenerateAst {
                 "This     : Token keyword",
                 "Unary    : Token operator , Expr right",
                 "Variable : Token name",
-                "Assign   : Token name, Expr value"
+                "Assign   : Token name, Expr value",
+                "LoxList     : List<Expr> exprs"
         ));
 
         defineAst(outputDir, "Stmt", Arrays.asList(

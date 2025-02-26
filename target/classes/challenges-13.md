@@ -44,3 +44,20 @@ Place in a nice box.
 --
 
 implemented in Scanner , Parser, Resolver and Interpreter
+
+## 3
+
+In the chapter where I introduced Lox, I challenged you to come up with a couple of features you think the language is missing. 
+Now that you know how to build an interpreter, implement one of those features.
+
+--
+
+implemented list in the ast as: 
+
+"[" expression* "]"
+
+
+
+implemented in Parser, Resolver and Interpreter
+
+
