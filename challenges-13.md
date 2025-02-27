@@ -57,8 +57,4 @@ implemented list in the ast as:
 list-> "[" item* "]"
 item-> expression (expression ",")*
 
-
-
 implemented in Parser, Resolver and Interpreter
-
-

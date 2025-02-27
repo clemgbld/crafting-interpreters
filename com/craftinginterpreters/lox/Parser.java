@@ -2,11 +2,11 @@ package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.Get;
 import com.craftinginterpreters.lox.Expr.Logical;
-import com.craftinginterpreters.lox.Expr.Variable;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static com.craftinginterpreters.lox.TokenType.*;
@@ -17,8 +17,11 @@ public class Parser {
     private final List<Token> tokens;
     private int current = 0;
 
-    public Parser(List<Token> tokens) {
+    private final BiConsumer<Token,String> logError;
+
+    public Parser(List<Token> tokens, BiConsumer<Token, String> logError) {
         this.tokens = tokens;
+        this.logError = logError;
     }
 
     List<Stmt> parse(){
@@ -207,7 +210,22 @@ public class Parser {
     }
 
     private Expr expression(){
-        return assignment();
+        return list();
+    }
+
+    private Expr list(){
+        if(!match(LEFT_BRACKET)){
+            return assignment();
+        }
+            List<Expr> exprs = new ArrayList<>();
+            if(match(RIGHT_BRACKET)){
+                return new Expr.LoxList(exprs);
+            }
+                do{
+                    exprs.add(assignment());
+                } while (match(COMMA));
+                consume(RIGHT_BRACKET,"Expect ']' after list items.");
+            return new Expr.LoxList(exprs);
     }
 
     private Expr assignment(){
@@ -336,7 +354,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message){
-        Lox.error(token,message);
+        logError.accept(token,message);
         return new ParseError();
     }
 

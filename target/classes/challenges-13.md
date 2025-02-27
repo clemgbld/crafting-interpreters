@@ -54,10 +54,7 @@ Now that you know how to build an interpreter, implement one of those features.
 
 implemented list in the ast as: 
 
-"[" expression* "]"
-
-
+list-> "[" item* "]"
+item-> expression (expression ",")*
 
 implemented in Parser, Resolver and Interpreter
-
-
