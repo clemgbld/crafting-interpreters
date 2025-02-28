@@ -95,6 +95,7 @@ public class ParserTest {
         assertEquals(TokenType.SEMICOLON,errors.get(0).name.type);
         assertEquals("Expect ']' after list items.",errors.get(0).message);
     }
+
     private void logError(Token name, String message){
         errors.add(new Error(name,message));
     }

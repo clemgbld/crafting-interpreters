@@ -1,22 +1,7 @@
-class Doughnut {
-  cook() {
-    print "Fry until golden brown.";
-    inner();
-    print "Place in a nice box.";
-  }
+fun add (a , b) {
+    return a + b;
 }
 
-class Cookie < Doughnut {
-    cook() {
-        print "Cookie monster.";
-        inner();
-    }
-}
+var x = [ 1 , 2 , add];
 
-class BostonCream < Cookie {
-  cook() {
-    print "Pipe full of custard and coat with chocolate.";
-  }
-}
-
-Doughnut().cook();
+print x;

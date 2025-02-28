@@ -537,6 +537,70 @@ public class InterpreterTest {
         assertEquals("Can't use 'inner' outside of a class.",errors.get(0).message);
     }
 
+    @Test
+    public void shouldBeAbleToPrintAnEmptyList(){
+       List<Stmt> ast = List.of(
+               new Print(
+                       new Expr.LoxList(
+                               List.of()
+                       )
+               )
+       );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals(List.of("[]"),logs);
+    }
+
+    @Test
+    public void shouldBeAbleToPrintAList(){
+        List<Stmt> ast = List.of(
+                new Var(
+                        new Token(TokenType.IDENTIFIER,"x",null,1),
+                        new Expr.Literal("1")
+                ),
+                new Print(
+                        new Expr.LoxList(
+                                List.of(
+                                        new Expr.Variable(new Token(TokenType.IDENTIFIER,"x",null,1)),
+                                        new Expr.Literal("2"),
+                                        new Expr.Literal("3")
+                                )
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals(List.of("[1, 2, 3]"),logs);
+    }
+
+    @Test
+    public void shouldBeAbleToCorrectlyPrintNilAndNumbers(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.LoxList(
+                                List.of(
+                                        new Expr.Literal(1.0),
+                                        new Expr.Literal(2.0),
+                                        new Expr.Literal(3.3),
+                                        new Expr.Literal(null)
+                                )
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals(List.of("[1, 2, 3.3, nil]"),logs);
+    }
+
 
 
     private void log(String message){

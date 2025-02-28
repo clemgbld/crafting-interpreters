@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -230,7 +231,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitLoxListExpr(Expr.LoxList expr) {
-        return null;
+        return new ArrayList<>(expr.exprs.stream().map(this::evaluate).toList());
     }
 
     @Override
@@ -339,6 +340,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     private String stringify(Object object) {
+        if(object instanceof ArrayList){
+            return "[" + ((ArrayList<?>) object).stream().map(this::stringify).collect(Collectors.joining(", ")) + "]" ;
+        }
         if (object == null) return "nil";
         if (object instanceof Double) {
             String text = object.toString();
