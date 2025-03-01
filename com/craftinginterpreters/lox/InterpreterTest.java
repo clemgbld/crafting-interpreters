@@ -601,6 +601,383 @@ public class InterpreterTest {
         assertEquals(List.of("[1, 2, 3.3, nil]"),logs);
     }
 
+    @Test
+    public void shouldBeAbleToCorrectlyIndexTheFirstElementOfAnArray(){
+        List<Stmt> ast = List.of(
+                new Print(
+                       new Expr.GetList(
+                               new Expr.LoxList(
+                                       List.of(
+                                               new Expr.Literal(1.0),
+                                               new Expr.Literal(2.0),
+                                               new Expr.Literal(3.3)
+                                       )
+                               ),
+                               new Expr.Literal(0.0),
+                               new Token(TokenType.LEFT_BRACKET, null, null, 4)
+                       )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals(List.of("1"),logs);
+    }
+
+    @Test
+    public void shouldBeAbleToCorrectlyIndexAnyElementOfAnArray(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.GetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0),
+                                                new Expr.Literal(3.3)
+                                        )
+                                ),
+                                new Expr.Literal(2.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals(List.of("3.3"),logs);
+    }
+
+    @Test
+    public void shouldARuntimeErrorToTheUserIfTheObjectToIndexIsNotAList(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.GetList(
+                                new Expr.Literal(1.0),
+                                new Expr.Literal(1.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("Only list can be indexed.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldThrowARuntimeErrorWhenTheIndexIsNotANumber(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.GetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0),
+                                                new Expr.Literal(3.3)
+                                        )
+                                ),
+                                new Expr.Literal("some string"),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("The index should be a number.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldThrowARuntimeErrorWhenTheIndexTheIndexIsNotAnInteger(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.GetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0),
+                                                new Expr.Literal(3.3)
+                                        )
+                                ),
+                                new Expr.Literal(0.2),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("The index should be an integer.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldThrowARuntimeErrorWhenTheIndexIsOutOfBound(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.GetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0),
+                                                new Expr.Literal(5.3)
+                                        )
+                                ),
+                                new Expr.Literal(3.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("Index 3 out of bound for length 3.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldThrowARuntimeErrorWhenTheIndexIsNegative(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.GetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0)
+                                        )
+                                ),
+                                new Expr.Literal(-1.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("Index -1 out of bound for length 2.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldBeAbleToSetTheFirstItemOfAList(){
+        List<Stmt> ast = List.of(
+                new Var(new Token(TokenType.IDENTIFIER,"x",null,1),
+                        new Expr.LoxList(
+                                List.of(
+                                        new Expr.Literal(1.0),
+                                        new Expr.Literal(2.0),
+                                        new Expr.Literal(3.3)
+                                )
+                        )
+                        ),
+                new Print(
+                        new Expr.SetList(
+                                new Expr.Variable(
+                                        new Token(TokenType.IDENTIFIER,"x",null,1)
+                                )
+                                ,
+                                new Expr.Literal(0.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4),
+                                new Expr.Literal(2.0)
+                        )
+                ),
+                new Print(
+                        new Expr.Variable(
+                                new Token(TokenType.IDENTIFIER,"x",null,1)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals(List.of("2", "[2, 2, 3.3]"),logs);
+    }
+
+    @Test
+    public void shouldBeAbleToSetTheAnytItemOfAList(){
+        List<Stmt> ast = List.of(
+                new Var(new Token(TokenType.IDENTIFIER,"x",null,1),
+                        new Expr.LoxList(
+                                List.of(
+                                        new Expr.Literal(1.0),
+                                        new Expr.Literal(2.0),
+                                        new Expr.Literal(3.3)
+                                )
+                        )
+                ),
+                new Print(
+                        new Expr.SetList(
+                                new Expr.Variable(
+                                        new Token(TokenType.IDENTIFIER,"x",null,1)
+                                )
+                                ,
+                                new Expr.Literal(1.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4),
+                                new Expr.Literal(3.0)
+                        )
+                ),
+                new Print(
+                        new Expr.Variable(
+                                new Token(TokenType.IDENTIFIER,"x",null,1)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals(List.of("3", "[1, 3, 3.3]"),logs);
+    }
+
+
+
+    @Test
+    public void shouldARuntimeErrorToTheUserIfTheObjectToIndexIsNotAListForSetList(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.SetList(
+                                new Expr.Literal(1.0),
+                                new Expr.Literal(1.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4),
+                                new Expr.Literal(null)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("Only list can be indexed.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldThrowARuntimeErrorWhenTheIndexIsNotANumberForSetList(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.SetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0),
+                                                new Expr.Literal(3.3)
+                                        )
+                                ),
+                                new Expr.Literal("some string"),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4),
+                                new Expr.Literal(null)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("The index should be a number.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldThrowARuntimeErrorWhenTheIndexTheIndexIsNotAnIntegerForSetList(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.SetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0),
+                                                new Expr.Literal(3.3)
+                                        )
+                                ),
+                                new Expr.Literal(0.2),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4),
+                                new Expr.Literal(null)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("The index should be an integer.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldThrowARuntimeErrorWhenTheIndexIsOutOfBoundForSetlist(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.SetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0),
+                                                new Expr.Literal(5.3)
+                                        )
+                                ),
+                                new Expr.Literal(3.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4),
+                                new Expr.Literal(null)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("Index 3 out of bound for length 3.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
+    @Test
+    public void shouldThrowARuntimeErrorWhenTheIndexIsNegativeforSetList(){
+        List<Stmt> ast = List.of(
+                new Print(
+                        new Expr.SetList(
+                                new Expr.LoxList(
+                                        List.of(
+                                                new Expr.Literal(1.0),
+                                                new Expr.Literal(2.0)
+                                        )
+                                ),
+                                new Expr.Literal(-1.0),
+                                new Token(TokenType.LEFT_BRACKET, null, null, 4),
+                                new Expr.Literal(null)
+                        )
+                )
+        );
+
+        Interpreter interpreter = new Interpreter(this::log,this::logRuntimeError);
+        Resolver resolver = new Resolver(interpreter,this::logError);
+        resolver.resolve(ast);
+        interpreter.interpret(ast);
+        assertEquals("Index -1 out of bound for length 2.",runtimeErrors.get(0).getMessage());
+        assertEquals(TokenType.LEFT_BRACKET,runtimeErrors.get(0).token.type);
+    }
+
 
 
     private void log(String message){

@@ -138,6 +138,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitGetListExpr(GetList expr) {
+        Object object = evaluate(expr.object);
+        Object index = evaluate(expr.index);
+        List<Object> loxList = validateIndexing(object,index,expr.name);
+        return loxList.get((int) (double) index);
+    }
+
+
+
+    @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
         return evaluate(expr.expression);
     }
@@ -167,6 +177,35 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object value = evaluate(expr.value);
         ((LoxInstance) object).set(expr.name,value);
         return value;
+    }
+
+    @Override
+    public Object visitSetListExpr(SetList expr) {
+        Object object = evaluate(expr.object);
+        Object index = evaluate(expr.index);
+        List<Object> loxList = validateIndexing(object,index,expr.name);
+        Object value = evaluate(expr.value);
+        loxList.set( (int)(double) index,value);
+        return value ;
+    }
+
+    private List<Object> validateIndexing(Object object, Object index, Token name){
+        if(!(object instanceof ArrayList<?>)){
+            throw new RuntimeError(name,"Only list can be indexed.");
+        }
+        if(!(index instanceof Double)){
+            throw new RuntimeError(name,"The index should be a number.");
+        }
+        if((double) index != Math.floor((double) index)){
+            throw new RuntimeError(name,"The index should be an integer.");
+        }
+        @SuppressWarnings("unchecked")
+        List<Object> loxList = (ArrayList<Object>) object;
+        int size = ((ArrayList<?>) object).size();
+        if(((double) index < 0) ||((int) (double) index > (size - 1))){
+            throw new RuntimeError(name,"Index " + (int) (double) index + " out of bound for length " + size  + ".");
+        }
+        return loxList;
     }
 
     @Override

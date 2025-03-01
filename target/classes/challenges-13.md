@@ -57,4 +57,6 @@ implemented list in the ast as:
 list-> "[" item* "]"
 item-> expression (expression ",")*
 
+list should be added in the primary rules
+
 implemented in Parser, Resolver and Interpreter

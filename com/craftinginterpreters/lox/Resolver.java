@@ -46,6 +46,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     @Override
+    public Void visitGetListExpr(GetList expr) {
+        resolve(expr.object);
+        resolve(expr.index);
+        return null;
+    }
+
+    @Override
     public Void visitGroupingExpr(Grouping expr) {
         resolve(expr.expression);
         return null;
@@ -67,6 +74,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     public Void visitSetExpr(Set expr) {
         resolve(expr.value);
         resolve(expr.object);
+        return null;
+    }
+
+    @Override
+    public Void visitSetListExpr(SetList expr) {
+        resolve(expr.object);
+        resolve(expr.index);
+        resolve(expr.value);
         return null;
     }
 

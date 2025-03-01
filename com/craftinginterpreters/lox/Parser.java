@@ -1,7 +1,9 @@
 package com.craftinginterpreters.lox;
 
 import com.craftinginterpreters.lox.Expr.Get;
+import com.craftinginterpreters.lox.Expr.GetList;
 import com.craftinginterpreters.lox.Expr.Logical;
+import com.craftinginterpreters.lox.Expr.SetList;
 import com.craftinginterpreters.lox.Stmt.*;
 
 import java.util.ArrayList;
@@ -210,21 +212,20 @@ public class Parser {
     }
 
     private Expr expression(){
-        return list();
+        return assignment();
     }
 
     private Expr list(){
-        if(!match(LEFT_BRACKET)){
-            return assignment();
-        }
             List<Expr> exprs = new ArrayList<>();
             if(match(RIGHT_BRACKET)){
                 return new Expr.LoxList(exprs);
             }
                 do{
-                    exprs.add(assignment());
+                    exprs.add(expression());
                 } while (match(COMMA));
                 consume(RIGHT_BRACKET,"Expect ']' after list items.");
+
+
             return new Expr.LoxList(exprs);
     }
 
@@ -240,6 +241,8 @@ public class Parser {
                return  new Expr.Assign(name,value);
            } else if (expr instanceof Get get) {
                return new Expr.Set(get.object,get.name,value);
+           } else if (expr instanceof GetList getList){
+                return new Expr.SetList(getList.object,getList.index,getList.name,value);
            }
            error(equals,"Invalid assignment target");
        }
@@ -300,7 +303,13 @@ public class Parser {
             } else if (match(DOT)) {
                Token name = consume(IDENTIFIER,"Expect property name after '.'.");
                expr = new Expr.Get(expr, name);
-            } else{
+            } else if (match(LEFT_BRACKET)){
+                Token name = previous();
+                Expr index = expression();
+                expr = new Expr.GetList(expr,index,name);
+               consume(RIGHT_BRACKET, "Expect ']' after list indexing.");
+            }
+            else{
                 break;
             }
         }
@@ -344,6 +353,10 @@ public class Parser {
 
        if(match(IDENTIFIER)){
            return new Expr.Variable(previous());
+       }
+
+       if(match(LEFT_BRACKET)){
+           return list();
        }
         throw error(peek(),"Expect expression.");
     }

@@ -54,7 +54,25 @@ Now that you know how to build an interpreter, implement one of those features.
 
 implemented list in the ast as: 
 
+
 list-> "[" item* "]"
 item-> expression (expression ",")*
+list should be added in the primary rules
+
+getList-> expression "[" expression "]"
+getList should be added in call
+
+setList-> getList "=" expression
+setList should be added in assignment
+
+the output enable the Lox to write programs like that:
+
+var x = [1 , 2 , 3, 4 , 5, 6, 7 , 8, 9 , 10];
+
+for(var i = 0; i < 10; i = i + 1){
+    x[i] = x[i] + 1;
+}
+
+print x;
 
 implemented in Parser, Resolver and Interpreter
