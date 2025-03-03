@@ -9,7 +9,7 @@ void initChunk(Chunk *chunk) {
 };
 
 void freeChunk(Chunk *chunk) {
-  FREE_ARRAY(u_int8_t, chunk, chunk->capacity);
+  FREE_ARRAY(u_int8_t, chunk->code, chunk->capacity);
   initChunk(chunk);
 }
 
