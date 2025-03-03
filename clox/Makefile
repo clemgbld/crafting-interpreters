@@ -3,7 +3,7 @@ CC = gcc
 # Compiler flags
 CFLAGS = -Wall -Wextra -Werror -g
 # Source files
-SRCS = memory.c chunk.c debug.c main.c
+SRCS = memory.c value.c chunk.c debug.c  main.c 
 # Object files
 OBJS = $(SRCS:.c=.o)
 # Output executable name
