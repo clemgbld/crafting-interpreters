@@ -38,9 +38,10 @@ int addConstant(Chunk *chunk, Value value) {
 }
 
 int getLine(Chunk *chunk, int index) {
-  if (chunk) {
+  for (int i = 0; i < chunk->count; i++) {
+    if (i == index) {
+      return chunk->lines[i];
+    }
   }
-  if (index) {
-  }
-  return 123;
+  exit(1);
 };
