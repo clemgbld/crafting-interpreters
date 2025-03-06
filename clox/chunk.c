@@ -36,3 +36,11 @@ int addConstant(Chunk *chunk, Value value) {
   writeValueArray(&chunk->constants, value);
   return chunk->constants.count - 1;
 }
+
+int getLine(Chunk *chunk, int index) {
+  if (chunk) {
+  }
+  if (index) {
+  }
+  return 123;
+};

@@ -2,24 +2,24 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g -I./include
 # For test files: add -I. so that "#include "munit/munit.h"" works (munit folder is in the root)
-TEST_CFLAGS = -Wall -Wextra -Werror -g -I./include -I.
+TEST_CFLAGS = $(CFLAGS) -I. -DTESTING
 LDFLAGS = 
 
-# Main source files
+# Main source files (excluding main.c for tests)
 SRCS = memory.c value.c chunk.c debug.c main.c
 OBJS = $(SRCS:.c=.o)
 TARGET = main
 
 # Test files: all files ending with .test.c
 TEST_SRCS = $(wildcard *.test.c)
-# Convert *.test.c into *.test.o
 TEST_OBJS = $(patsubst %.test.c,%.test.o,$(TEST_SRCS))
 TEST_EXEC = test_runner
 
-# MUnit submodule is assumed to be in the root folder (i.e. there's a "munit" folder)
-
-# Compile munit.c before test files
+# MUnit submodule (assumed in "munit" folder)
 MUNIT_OBJ = munit/munit.o
+
+# Remove main.c from production objects when building tests
+TEST_OBJS_PROD = $(filter-out main.o, $(OBJS))
 
 # Default rule: build main program
 all: deps $(TARGET)
@@ -45,9 +45,9 @@ munit/munit.o: munit/munit.c
 %.test.o: %.test.c
 	$(CC) $(TEST_CFLAGS) -c $< -o $@
 
-# Link all object files (including munit.o) into the test runner
-$(TEST_EXEC): $(TEST_OBJS) $(MUNIT_OBJ)
-	$(CC) $(TEST_CFLAGS) $(TEST_OBJS) $(MUNIT_OBJ) -o $(TEST_EXEC) $(LDFLAGS)
+# Link all object files (excluding main.o) into the test runner
+$(TEST_EXEC): $(TEST_OBJS) $(TEST_OBJS_PROD) $(MUNIT_OBJ)
+	$(CC) $(TEST_CFLAGS) $(TEST_OBJS) $(TEST_OBJS_PROD) $(MUNIT_OBJ) -o $(TEST_EXEC) $(LDFLAGS)
 
 # Run tests
 test: deps $(TEST_EXEC)

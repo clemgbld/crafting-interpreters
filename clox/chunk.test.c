@@ -1,22 +1,25 @@
+#include "chunk.h"
 #include "munit/munit.h"
 
 // Sample test function
-static MunitResult test_example(const MunitParameter params[],
-                                void *user_data) {
-  (void)params;
-  (void)user_data;
-  munit_assert(1 + 1 == 2);
+static MunitResult can_get_the_line_of_chunk() {
+  Chunk chunk;
+  initChunk(&chunk);
+  writeChunk(&chunk, OP_RETURN, 123);
+  munit_assert(getLine(&chunk, 0) == 123);
+  freeChunk(&chunk);
   return MUNIT_OK;
 }
 
 // Define test suite
 static MunitTest tests[] = {
-    {"/example", test_example, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+    {"/can get teh line of a chunk", can_get_the_line_of_chunk, NULL, NULL,
+     MUNIT_TEST_OPTION_NONE, NULL},
     {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL} // Sentinel
 };
 
 // Define MUnit suite
-static const MunitSuite suite = {"/test_suite", tests, NULL, 1,
+static const MunitSuite suite = {"/get_line_test_suite", tests, NULL, 1,
                                  MUNIT_SUITE_OPTION_NONE};
 
 // Main function
