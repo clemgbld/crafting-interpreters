@@ -1,14 +1,14 @@
-#include <stdio.h>
-
-#include "chunk.h"
 #include "debug.h"
+#include "chunk.h"
 #include "value.h"
+#include <stdint.h>
+#include <stdio.h>
 
 void disassembleChunk(Chunk *chunk, const char *name) {
   printf("== %s ==\n", name);
 
   for (int offset = 0; offset < chunk->count;) {
-    offset = dissassembleInstruction(chunk, offset);
+    offset = disassembleInstruction(chunk, offset);
   }
 }
 
@@ -25,12 +25,12 @@ static int constantInstruction(const char *name, Chunk *chunk, int offset) {
   return offset + 2;
 }
 
-int dissassembleInstruction(Chunk *chunk, int offset) {
-  printf("%04d", offset);
+int disassembleInstruction(Chunk *chunk, int offset) {
+  printf("%04d ", offset);
   if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
-    printf(" | ");
+    printf("  | ");
   } else {
-    printf("%4d", chunk->lines[offset]);
+    printf("%4d ", chunk->lines[offset]);
   }
 
   uint8_t instruction = chunk->code[offset];
@@ -44,4 +44,4 @@ int dissassembleInstruction(Chunk *chunk, int offset) {
     printf("Unknown opcode %d\n", instruction);
     return offset + 1;
   }
-};
+}

@@ -4,18 +4,11 @@
 #include <stdlib.h>
 
 void initChunk(Chunk *chunk) {
-  chunk->count = 0;
   chunk->capacity = 0;
+  chunk->count = 0;
   chunk->code = NULL;
   chunk->lines = NULL;
   initValueArray(&chunk->constants);
-};
-
-void freeChunk(Chunk *chunk) {
-  FREE_ARRAY(u_int8_t, chunk->code, chunk->capacity);
-  FREE_ARRAY(int, chunk->lines, chunk->capacity);
-  initChunk(chunk);
-  freeValueArray(&chunk->constants);
 }
 
 void writeChunk(Chunk *chunk, uint8_t byte, int line) {
@@ -26,22 +19,19 @@ void writeChunk(Chunk *chunk, uint8_t byte, int line) {
         GROW_ARRAY(uint8_t, chunk->code, oldCapacity, chunk->capacity);
     chunk->lines = GROW_ARRAY(int, chunk->lines, oldCapacity, chunk->capacity);
   }
-
   chunk->code[chunk->count] = byte;
   chunk->lines[chunk->count] = line;
   chunk->count++;
+}
+
+void freeChunk(Chunk *chunk) {
+  FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
+  FREE_ARRAY(int, chunk->lines, chunk->capacity);
+  freeValueArray(&chunk->constants);
+  initChunk(chunk);
 }
 
 int addConstant(Chunk *chunk, Value value) {
   writeValueArray(&chunk->constants, value);
   return chunk->constants.count - 1;
 }
-
-int getLine(Chunk *chunk, int index) {
-  for (int i = 0; i < chunk->count; i++) {
-    if (i == index) {
-      return chunk->lines[i];
-    }
-  }
-  exit(1);
-};

@@ -8,7 +8,7 @@ LDFLAGS =
 # Main source files (excluding main.c for tests)
 SRCS = memory.c value.c chunk.c debug.c main.c
 OBJS = $(SRCS:.c=.o)
-TARGET = main
+TARGET = program 
 
 # Test files: all files ending with .test.c
 TEST_SRCS = $(wildcard *.test.c)
