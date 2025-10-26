@@ -5,7 +5,7 @@
 #include "common.h"
 #include "value.h"
 
-typedef enum { OP_RETURN, OP_CONSTANT } OpCode;
+typedef enum { OP_RETURN, OP_CONSTANT, OP_CONSTANT_LONG } OpCode;
 
 typedef struct {
   int count;
@@ -43,5 +43,7 @@ void writeLineArray(LineArray *lineArray, int line);
 void initLine(Line *line, int number);
 
 int getLine(Chunk *chunk, int index);
+
+void writeConstant(Chunk *chunk, Value value, int line);
 
 #endif

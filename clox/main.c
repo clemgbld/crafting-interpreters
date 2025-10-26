@@ -5,12 +5,13 @@
 int main() {
   Chunk chunk;
   initChunk(&chunk);
-  int constant = addConstant(&chunk, 1.2);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-
   writeChunk(&chunk, OP_RETURN, 123);
+  for (int i = 0; i <= 255; i++) {
+    writeConstant(&chunk, 1.2, i + 1);
+  }
+  writeConstant(&chunk, 55.5, 257);
   disassembleChunk(&chunk, "test chunk");
+
   freeChunk(&chunk);
   return 0;
 }

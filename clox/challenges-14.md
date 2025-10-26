@@ -10,3 +10,28 @@ Change writeChunk() to write this compressed form, and implement a getLine() fun
 
 Hint: It’s not necessary for getLine() to be particularly efficient. 
 Since it is called only when a runtime error occurs, it is well off the critical path where performance matters.
+
+## 2 
+
+Because OP_CONSTANT uses only a single byte for its operand, a chunk may only contain up to 256 different constants. That’s small enough that people writing real-world code will hit that limit. We could use two or more bytes to store the operand, but that makes every constant instruction take up more space. Most chunks won’t need that many unique constants, so that wastes space and sacrifices some locality in the common case to support the rare case.
+
+To balance those two competing aims, many instruction sets feature multiple instructions that perform the same operation but with operands of different sizes. Leave our existing one-byte OP_CONSTANT instruction alone, and define a second OP_CONSTANT_LONG instruction. It stores the operand as a 24-bit number, which should be plenty.
+
+Implement this function:
+
+```c
+```c
+void writeConstant(Chunk* chunk, Value value, int line) {
+  // Implement me...
+}
+```
+
+
+It adds value to chunk’s constant array and then writes an appropriate instruction to load the constant. Also add support to the disassembler for OP_CONSTANT_LONG instructions
+
+Defining two instructions seems to be the best of both worlds. What sacrifices, if any, does it force on us?
+
+Indeed that really seems to be the best of both world, it force on us to 
+handle the case when there is more than 255 constants by adding some bits logic but it's stays straightforward in my opinion.
+Maybe it's sacrifices the "one instruction does one thing" but i think it is worth it.
+

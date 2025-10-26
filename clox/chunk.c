@@ -1,6 +1,7 @@
 #include "chunk.h"
 #include "memory.h"
 #include "value.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 void initLineArray(LineArray *lineArray) {
@@ -73,6 +74,19 @@ void freeChunk(Chunk *chunk) {
   freeLineArray(&chunk->lines);
   freeValueArray(&chunk->constants);
   initChunk(chunk);
+}
+
+void writeConstant(Chunk *chunk, Value value, int line) {
+  int constant = addConstant(chunk, value);
+  if (constant > 255) {
+    writeChunk(chunk, OP_CONSTANT_LONG, line);
+    writeChunk(chunk, (constant >> 16), line);
+    writeChunk(chunk, (constant >> 8), line);
+    writeChunk(chunk, (constant & 255), line);
+  } else {
+    writeChunk(chunk, OP_CONSTANT, line);
+    writeChunk(chunk, constant, line);
+  }
 }
 
 int addConstant(Chunk *chunk, Value value) {
