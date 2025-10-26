@@ -35,3 +35,8 @@ Indeed that really seems to be the best of both world, it force on us to
 handle the case when there is more than 255 constants by adding some bits logic but it's stays straightforward in my opinion.
 Maybe it's sacrifices the "one instruction does one thing" but i think it is worth it.
 
+#3
+
+Our reallocate() function relies on the C standard library for dynamic memory allocation and freeing. malloc() and free() aren’t magic. Find a couple of open source implementations of them and explain how they work. How do they keep track of which bytes are allocated and which are free? What is required to allocate a block of memory? Free it? How do they make that efficient? What do they do about fragmentation?
+
+Hardcore mode: Implement reallocate() without calling realloc(), malloc(), or free(). You are allowed to call malloc() once, at the beginning of the interpreter’s execution, to allocate a single big block of memory, which your reallocate() function has access to. It parcels out blobs of memory from that single region, your own personal heap. It’s your job to define how it does that
