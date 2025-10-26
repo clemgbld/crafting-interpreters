@@ -1,7 +1,5 @@
-/*
 #include "chunk.h"
 #include "munit/munit.h"
-
 
 // Sample test function
 static MunitResult can_get_the_line_of_chunk() {
@@ -56,4 +54,3 @@ static const MunitSuite suite = {"/get_line_test_suite", tests, NULL, 1,
 int main(int argc, char *argv[]) {
   return munit_suite_main(&suite, NULL, argc, argv);
 }
-*/
