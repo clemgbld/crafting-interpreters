@@ -9,6 +9,7 @@ typedef struct {
   int capacity;
   int count;
   Value *values;
+  Value *stackTop;
 } ValueArray;
 
 void initValueArray(ValueArray *array);
