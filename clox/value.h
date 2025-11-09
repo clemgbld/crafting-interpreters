@@ -17,4 +17,7 @@ void freeValueArray(ValueArray *array);
 void writeValueArray(ValueArray *array, Value value);
 void printValue(Value value);
 
+void pushStack(ValueArray *array, Value value);
+Value popStack(ValueArray *array);
+
 #endif

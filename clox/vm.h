@@ -9,8 +9,7 @@
 typedef struct {
   Chunk *chunk;
   uint8_t *ip;
-  Value stack[STACK_MAX];
-  Value *stackTop;
+  ValueArray stack;
 } VM;
 
 void initVM();
@@ -24,9 +23,5 @@ typedef enum {
 } InterpretResult;
 
 InterpretResult interpret(Chunk *chunk);
-
-void push(Value value);
-
-Value pop();
 
 #endif
