@@ -51,7 +51,7 @@ static InterpretResult run() {
       push(constant);
       break;
     }
-    case OP_SUBSTRACT: {
+    case OP_SUBTRACT: {
       BINARY_OP(-);
       break;
     }
