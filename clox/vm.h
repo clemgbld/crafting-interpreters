@@ -2,6 +2,7 @@
 #define clox_vm_h
 
 #include "chunk.h"
+#include "compiler.h"
 #include "value.h"
 
 #define STACK_MAX 256
@@ -23,7 +24,7 @@ typedef enum {
   INTERPRET_RUNTIME_ERROR
 } InterpretResult;
 
-InterpretResult interpret(Chunk *chunk);
+InterpretResult interpret(const char *source);
 
 void push(Value value);
 

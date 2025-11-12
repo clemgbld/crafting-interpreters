@@ -23,6 +23,8 @@ void initVM() { resetStack(); };
 
 void freeVM() {};
 
+/*
+
 static InterpretResult run() {
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
@@ -82,9 +84,9 @@ static InterpretResult run() {
 #undef READ_CONSTANT
 #undef BINARY_OP
 }
+*/
 
-InterpretResult interpret(Chunk *chunk) {
-  vm.chunk = chunk;
-  vm.ip = vm.chunk->code;
-  return run();
+InterpretResult interpret(const char *source) {
+  compile(source);
+  return INTERPRET_OK;
 }
