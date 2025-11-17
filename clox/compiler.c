@@ -19,6 +19,7 @@ typedef struct {
 typedef enum {
   PREC_NONE,
   PREC_ASSIGNMENT, // =
+  PREC_TERNARY,    // ? :
   PREC_OR,         // or
   PREC_AND,        // and
   PREC_EQUALITY,   // == !=
@@ -78,6 +79,7 @@ static void advance() {
 };
 
 static void consume(TokenType type, const char *message) {
+  printf("consume(%d)\n", type);
   if (parser.current.type == type) {
     advance();
     return;
@@ -109,6 +111,7 @@ static ParseRule *getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 
 static void parsePrecedence(Precedence precedence) {
+  printf("parsePrecedence(%d)\n", precedence);
   advance();
   ParseFn prefixRule = getRule(parser.previous.type)->prefix;
   if (prefixRule == NULL) {
@@ -125,6 +128,7 @@ static void parsePrecedence(Precedence precedence) {
 }
 
 static void binary() {
+  printf("binary()\n");
   TokenType operatorType = parser.previous.type;
   ParseRule *rule = getRule(operatorType);
   parsePrecedence((Precedence)(rule->precedence + 1));
@@ -162,16 +166,27 @@ static void emitConstant(double value) {
 static void expression() { parsePrecedence(PREC_ASSIGNMENT); }
 
 static void number() {
+  printf("number()\n");
   double value = strtod(parser.previous.start, NULL);
   emitConstant(value);
 }
 
 static void grouping() {
+  printf("grouping()\n");
   expression();
   consume(TOKEN_RIGHT_PAREN, "Exprect ')' after expression");
 }
 
+static void ternary() {
+  printf("ternary()\n");
+  parsePrecedence(PREC_OR);
+  consume(TOKEN_COLON, "Exprect ':' after expression");
+  parsePrecedence(PREC_OR);
+  parsePrecedence(PREC_TERNARY);
+}
+
 static void unary() {
+  printf("unary()\n");
   TokenType operatorType = parser.previous.type;
   // Compile the operand.
   parsePrecedence(PREC_UNARY);
@@ -195,8 +210,10 @@ ParseRule rules[] = {
     [TOKEN_MINUS] = {unary, binary, PREC_TERM},
     [TOKEN_PLUS] = {NULL, binary, PREC_TERM},
     [TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
+    [TOKEN_COLON] = {NULL, NULL, PREC_NONE},
     [TOKEN_SLASH] = {NULL, binary, PREC_FACTOR},
     [TOKEN_STAR] = {NULL, binary, PREC_FACTOR},
+    [TOKEN_QUERY] = {NULL, ternary, PREC_TERNARY},
     [TOKEN_BANG] = {NULL, NULL, PREC_NONE},
     [TOKEN_BANG_EQUAL] = {NULL, NULL, PREC_NONE},
     [TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},
@@ -228,7 +245,10 @@ ParseRule rules[] = {
     [TOKEN_EOF] = {NULL, NULL, PREC_NONE},
 };
 
-static ParseRule *getRule(TokenType type) { return &rules[type]; }
+static ParseRule *getRule(TokenType type) {
+  printf("getRule(%d)\n", type);
+  return &rules[type];
+}
 
 bool compile(const char *source, Chunk *chunk) {
   initScanner(source);
