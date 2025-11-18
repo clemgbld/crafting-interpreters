@@ -23,7 +23,7 @@ static Token makeToken(TokenType type) {
   Token token;
   token.type = type;
   token.start = scanner.start;
-  token.length = (scanner.current - scanner.start);
+  token.length = (int)(scanner.current - scanner.start);
   token.line = scanner.line;
   return token;
 }
@@ -52,7 +52,7 @@ static char advance() {
 static bool match(char expected) {
   if (isAtEnd())
     return false;
-  if (*scanner.current == expected)
+  if (*scanner.current != expected)
     return false;
   scanner.current++;
   return true;
