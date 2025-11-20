@@ -1,7 +1,9 @@
 #include "value.h"
 #include "memory.h"
+#include "object.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void initValueArray(ValueArray *array) {
   array->values = NULL;
@@ -28,6 +30,9 @@ void writeValueArray(ValueArray *array, Value value) {
 
 void printValue(Value value) {
   switch (value.type) {
+  case VAL_OBJ:
+    printObject(value);
+    break;
   case VAL_BOOL:
     printf(AS_BOOL(value) ? "true" : "false");
     break;
@@ -50,6 +55,13 @@ bool valuesEqual(Value a, Value b) {
     return true;
   case VAL_NUMBER:
     return AS_NUMBER(a) == AS_NUMBER(b);
+  case VAL_OBJ: {
+    ObjString *aString = AS_STRING(a);
+    ObjString *bString = AS_STRING(b);
+    return aString->length == bString->length &&
+           memcmp(aString->chars, bString->chars, aString->length) == 0;
+  }
+
   default:
     return false; // Unreachable
   }

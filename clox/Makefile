@@ -6,7 +6,7 @@ TEST_CFLAGS = $(CFLAGS) -I. -DTESTING
 LDFLAGS = 
 
 # Main source files (excluding main.c for tests)
-SRCS = memory.c value.c chunk.c debug.c vm.c compiler.c scanner.c main.c
+SRCS = memory.c value.c chunk.c debug.c vm.c compiler.c scanner.c object.c main.c
 OBJS = $(SRCS:.c=.o)
 TARGET = program 
 
