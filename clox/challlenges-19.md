@@ -46,7 +46,7 @@ static ObjString *allocateString(const char *strs[], const int lengths[],
     }
   }
 
-  string->chars[length + 1] = '\0';
+  string->chars[length] = '\0';
 
   return string;
 }
@@ -87,7 +87,7 @@ static void freeObject(Obj *object) {
   switch (object->type) {
   case OBJ_STRING: {
     ObjString *string = (ObjString *)object;
-    reallocate(NULL, sizeof(ObjString) + (length + 1) * sizeof(char),0)
+    reallocate(NULL, sizeof(ObjString) + (string->length + 1) * sizeof(char),0)
     break;
   }
   }
