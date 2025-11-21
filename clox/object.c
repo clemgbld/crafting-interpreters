@@ -17,10 +17,19 @@ static Obj *allocateObject(size_t size, ObjType type) {
   return object;
 }
 
+static ObjString *allocateContantString(const char *chars, int length) {
+  ObjString *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
+  string->length = length;
+  string->stringType = CONSTANT;
+  string->as.constant = chars;
+  return string;
+}
+
 static ObjString *allocateString(char *chars, int length) {
   ObjString *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
   string->length = length;
-  string->chars = chars;
+  string->stringType = OWNED;
+  string->as.chars = chars;
   return string;
 }
 
@@ -28,17 +37,25 @@ ObjString *takeString(char *chars, int length) {
   return allocateString(chars, length);
 }
 
-ObjString *copyString(const char *chars, int length) {
-  char *heapChars = ALLOCATE(char, length + 1);
-  memcpy(heapChars, chars, length);
-  heapChars[length] = '\0';
-  return allocateString(heapChars, length);
+ObjString *createConstantString(const char *chars, int length) {
+  return allocateContantString(chars, length);
+}
+
+const char *getString(ObjString *string) {
+  switch (string->stringType) {
+  case CONSTANT:
+    return string->as.constant;
+  case OWNED:
+    return string->as.chars;
+  }
 }
 
 void printObject(Value value) {
   switch (OBJ_TYPE(value)) {
-  case OBJ_STRING:
-    printf("%s", AS_CSTRING(value));
+  case OBJ_STRING: {
+    ObjString *string = AS_STRING(value);
+    printf("\"%.*s\"", string->length, getString(string));
     break;
+  }
   }
 }

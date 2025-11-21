@@ -17,6 +17,7 @@ void freeValueArray(ValueArray *array) {
 }
 
 void writeValueArray(ValueArray *array, Value value) {
+
   if (array->capacity < array->count + 1) {
     int oldCapacity = array->capacity;
     array->capacity = GROW_CAPACITY(oldCapacity);
@@ -59,7 +60,7 @@ bool valuesEqual(Value a, Value b) {
     ObjString *aString = AS_STRING(a);
     ObjString *bString = AS_STRING(b);
     return aString->length == bString->length &&
-           memcmp(aString->chars, bString->chars, aString->length) == 0;
+           memcmp(getString(aString), getString(bString), aString->length) == 0;
   }
 
   default:
