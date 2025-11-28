@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "memory.h"
 #include "object.h"
+#include "table.h"
 #include "value.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -57,9 +58,13 @@ Value pop() {
 void initVM() {
   resetStack();
   vm.objects = NULL;
+  initTable(&vm.strings);
 };
 
-void freeVM() { freeObjects(); };
+void freeVM() {
+  freeObjects();
+  freeTable(&vm.strings);
+};
 
 static InterpretResult run() {
 #define READ_BYTE() (*vm.ip++)
