@@ -59,13 +59,11 @@ void initVM() {
   resetStack();
   vm.objects = NULL;
   initTable(&vm.strings);
-  initTable(&vm.globals);
 };
 
 void freeVM() {
   freeObjects();
   freeTable(&vm.strings);
-  freeTable(&vm.globals);
 };
 
 static InterpretResult run() {
@@ -115,27 +113,27 @@ static InterpretResult run() {
       break;
     case OP_GET_GLOBAL: {
       ObjString *name = READ_STRING();
-      Value value;
-      if (!tableGet(&vm.globals, name, &value)) {
+      if (!name->hasValue) {
         runtimeError("Undefined variable '%s'.", name->chars);
         return INTERPRET_RUNTIME_ERROR;
       }
-      push(value);
+      push(name->value);
       break;
     }
     case OP_DEFINE_GLOBAL: {
       ObjString *name = READ_STRING();
-      tableSet(&vm.globals, name, peek(0));
+      name->value = peek(0);
+      name->hasValue = true;
       pop();
       break;
     }
     case OP_SET_GLOBAL: {
       ObjString *name = READ_STRING();
-      if (tableSet(&vm.globals, name, peek(0))) {
-        tableDelete(&vm.globals, name);
+      if (!name->hasValue) {
         runtimeError("Undefined variable '%s'.", name->chars);
         return INTERPRET_RUNTIME_ERROR;
       }
+      name->value = peek(0);
       break;
     }
     case OP_EQUAL: {
