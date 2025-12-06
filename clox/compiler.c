@@ -307,7 +307,7 @@ static void block() {
 }
 
 static void varDeclaration() {
-  uint8_t global = parseVariable("Exprect variable name");
+  uint8_t global = parseVariable("Expect variable name");
 
   if (match(TOKEN_EQUAL)) {
     expression();
@@ -413,7 +413,7 @@ static void variable(bool canAssign) {
 static void grouping(bool canAssign) {
   (void)canAssign;
   expression();
-  consume(TOKEN_RIGHT_PAREN, "Exprect ')' after expression");
+  consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression");
 }
 
 static void unary(bool canAssign) {
