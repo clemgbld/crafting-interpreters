@@ -45,7 +45,7 @@ typedef struct {
 } Local;
 
 typedef struct {
-  Local locals[UINT8_COUNT];
+  Local locals[UINT16_COUNT];
   int localCount;
   int scopeDepth;
 } Compiler;
@@ -388,10 +388,17 @@ static void string(bool canAssign) {
 static void namedVariable(Token name, bool canAssign) {
   uint8_t getOp, setOp;
   int arg = resolveLocal(current, &name);
+  bool isLocal = false;
 
   if (arg != -1) {
-    getOp = OP_GET_LOCAL;
-    setOp = OP_SET_LOCAL;
+    isLocal = true;
+    if (arg > UINT8_MAX) {
+      getOp = OP_GET_LOCAL_LONG;
+      setOp = OP_SET_LOCAL_LONG;
+    } else {
+      getOp = OP_GET_LOCAL;
+      setOp = OP_SET_LOCAL;
+    }
   } else {
     arg = identifierConstant(&name);
     getOp = OP_GET_GLOBAL;
@@ -400,9 +407,19 @@ static void namedVariable(Token name, bool canAssign) {
 
   if (canAssign && match(TOKEN_EQUAL)) {
     expression();
-    emitBytes(setOp, (uint8_t)arg);
+    if (isLocal && arg > UINT8_MAX) {
+      emitBytes(setOp, ((uint8_t)arg) >> 8);
+      emitByte(((uint8_t)arg) & 255);
+    } else {
+      emitBytes(setOp, (uint8_t)arg);
+    }
   } else {
-    emitBytes(getOp, (uint8_t)arg);
+    if (isLocal && arg > UINT8_MAX) {
+      emitBytes(getOp, ((uint8_t)arg) >> 8);
+      emitByte(((uint8_t)arg) & 255);
+    } else {
+      emitBytes(getOp, (uint8_t)arg);
+    }
   }
 }
 

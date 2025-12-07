@@ -224,3 +224,139 @@ ParseRule rules[] = {
     [TOKEN_EOF] = {NULL, NULL, PREC_NONE},
 };
 ```
+
+## 4
+
+Extend clox to allow more than 256 local variables to be in scope at a time.
+
+In common.h
+
+```c
+
+#define UINT16_COUNT (UINT16_MAX + 1)
+```
+
+In compiler.h
+
+```c
+typedef struct {
+  Local locals[UINT16_COUNT];
+  int localCount;
+  int scopeDepth;
+} Compiler;
+
+static void namedVariable(Token name, bool canAssign) {
+  uint8_t getOp, setOp;
+  int arg = resolveLocal(current, &name);
+  bool isLocal = false;
+
+  if (arg != -1) {
+    isLocal = true;
+    if (arg > UINT8_MAX) {
+      getOp = OP_GET_LOCAL_LONG;
+      setOp = OP_SET_LOCAL_LONG;
+    } else {
+      getOp = OP_GET_LOCAL;
+      setOp = OP_SET_LOCAL;
+    }
+  } else {
+    arg = identifierConstant(&name);
+    getOp = OP_GET_GLOBAL;
+    setOp = OP_SET_GLOBAL;
+  }
+
+  if (canAssign && match(TOKEN_EQUAL)) {
+    expression();
+    if (isLocal && arg > UINT8_MAX) {
+      emitBytes(setOp,  (uint8_t)(arg >> 8));
+      emitByte(arg & 255);
+    } else {
+      emitBytes(setOp, (uint8_t)arg);
+    }
+  } else {
+    if (isLocal && arg > UINT8_MAX) {
+      emitBytes(getOp, (uint8_t)(arg >> 8));
+      emitByte(arg & 255);
+    } else {
+      emitBytes(getOp, (uint8_t)arg);
+    }
+  }
+}
+```
+
+In chunk.h
+
+```c
+typedef enum {
+  OP_CONSTANT,
+  OP_NIL,
+  OP_TRUE,
+  OP_FALSE,
+  OP_POP,
+  OP_GET_LOCAL,
+  OP_GET_LOCAL_LONG,
+  OP_GET_GLOBAL,
+  OP_DEFINE_GLOBAL,
+  OP_SET_LOCAL,
+  OP_SET_LOCAL_LONG,
+  OP_SET_GLOBAL,
+  OP_EQUAL,
+  OP_GREATER,
+  OP_LESS,
+  OP_ADD,
+  OP_SUBTRACT,
+  OP_MULTIPLY,
+  OP_DIVIDE,
+  OP_NOT,
+  OP_NEGATE,
+  OP_PRINT,
+  OP_RETURN
+} OpCode;
+
+```
+
+In vm.h
+
+```c
+
+#define STACK_MAX UINT16_COUNT
+```
+
+In vm.c
+
+```c
+case OP_GET_LOCAL_LONG: {
+      uint8_t firstByte = READ_BYTE();
+      uint8_t secondByte = READ_BYTE();
+      uint16_t slot = ((uint16_t) firstByte << 8) | secondByte;
+      push(vm.stack[slot]);
+      break;
+    }
+
+case OP_SET_LOCAL_LONG: {
+      uint8_t firstByte = READ_BYTE();
+      uint8_t secondByte = READ_BYTE();
+      uint16_t slot = ((uint16_t) firstByte << 8) | secondByte;
+      vm.stack[slot] = peek(0);
+      break;
+    }
+```
+
+In debug.c
+
+```c
+static int byteLongInstruction(const char *name, Chunk *chunk, int offset) {
+  uint8_t firstByte = chunk->code[offset + 1];
+  uint8_t secondByte = chunk->code[offset + 2];
+  uint16_t slot = ((uint16_t) firstByte << 8) | secondByte;
+  printf("%-16s %4d\n", name, slot);
+  return offset + 3;
+}
+
+
+  case OP_GET_LOCAL_LONG:
+    return byteLongInstruction("OP_GET_LOCAL_LONG", chunk, offset);
+  case OP_SET_LOCAL_LONG:
+    return byteLongInstruction("OP_SET_LOCAL_LONG", chunk, offset);
+
+```
