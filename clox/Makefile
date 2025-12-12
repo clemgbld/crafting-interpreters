@@ -54,8 +54,10 @@ test: deps $(TEST_EXEC)
 	./$(TEST_EXEC)
 
 # Run the main program
+ARGS ?=
+
 run: $(TARGET)
-	./$(TARGET)
+	./$(TARGET) $(ARGS)
 
 # Clean up build artifacts
 clean:
