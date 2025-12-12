@@ -14,8 +14,14 @@ make all
 
 ```bash
 make run
-```
 
+```
+### run main program with arguments
+
+```bash
+make run ARGS="file.txt"
+
+```
 
 ### run test
 
