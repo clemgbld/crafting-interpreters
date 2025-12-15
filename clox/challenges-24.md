@@ -1,3 +1,16 @@
+# CHALLENGES 24
+
+## 1
+
+Reading and writing the ip field is one of the most frequent operations inside the bytecode loop. Right now, we access it through a pointer to the current CallFrame. That requires a pointer indirection which may force the CPU to bypass the cache and hit main memory. That can be a real performance sink.
+
+Ideally, we’d keep the ip in a native CPU register. C doesn’t let us require that without dropping into inline assembly, but we can structure the code to encourage the compiler to make that optimization. If we store the ip directly in a C local variable and mark it register, there’s a good chance the C compiler will accede to our polite request.
+
+This does mean we need to be careful to load and store the local ip back into the correct CallFrame when starting and ending function calls. Implement this optimization. Write a couple of benchmarks and see how it affects the performance. Do you think the extra code complexity is worth it?
+
+In vm.c
+
+```c
 #include "vm.h"
 #include "chunk.h"
 #include "common.h"
@@ -7,6 +20,7 @@
 #include "table.h"
 #include "value.h"
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -44,9 +58,9 @@ static void runtimeError(const char *format, ...) {
   resetStack();
 }
 
-static void defineNative(const char *name, NativeFn function, int arity) {
+static void defineNative(const char *name, NativeFn function) {
   push(OBJ_VAL(copyString(name, (int)strlen(name))));
-  push(OBJ_VAL(newNative(function, arity)));
+  push(OBJ_VAL(newNative(function)));
   tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
   pop();
   pop();
@@ -68,7 +82,6 @@ static bool call(ObjFunction *function, int argCount) {
 
   CallFrame *frame = &vm.frames[vm.frameCount++];
   frame->function = function;
-  frame->ip = function->chunk.code;
   frame->slots = vm.stackTop - argCount - 1;
   return true;
 }
@@ -79,19 +92,12 @@ static bool callValue(Value callee, int argCount) {
     case OBJ_FUNCTION:
       return call(AS_FUNCTION(callee), argCount);
     case OBJ_NATIVE: {
-      ObjNative *nativeFn = AS_NATIVE(callee);
-      NativeFn native = nativeFn->function;
-      if (nativeFn->arity != argCount) {
-        runtimeError("Expected %d arguments but got %d.", nativeFn->arity,
-                     argCount);
-        return false;
-      }
+      NativeFn native = AS_NATIVE(callee);
       Value result = native(argCount, vm.stackTop - argCount);
       vm.stackTop -= argCount + 1;
       push(result);
       return true;
     }
-
     default:
       break;
     }
@@ -132,7 +138,7 @@ void initVM() {
   vm.objects = NULL;
   initTable(&vm.strings);
   initTable(&vm.globals);
-  defineNative("clock", clockNative, 0);
+  defineNative("clock", clockNative);
 };
 
 void freeVM() {
@@ -143,15 +149,16 @@ void freeVM() {
 
 static InterpretResult run() {
   CallFrame *frame = &vm.frames[vm.frameCount - 1];
+  register uint8_t *ip = frame->ip;
 
-#define READ_BYTE() (*frame->ip++)
-#define READ_SHORT()                                                           \
-  (frame->ip += 2, (uint16_t)((frame->ip[-2] << 8) | frame->ip[-1]))
+#define READ_BYTE() (*(ip++))
+#define READ_SHORT() (ip += 2, (uint16_t)((ip[-2] << 8) | ip[-1]))
 #define READ_CONSTANT() (frame->function->chunk.constants.values[READ_BYTE()])
 #define READ_STRING() AS_STRING(READ_CONSTANT())
 #define BINARY_OP(valueType, op)                                               \
   do {                                                                         \
     if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {                          \
+      frame->ip = ip;                                                          \
       runtimeError("Operands must be numbers.");                               \
       return INTERPRET_RUNTIME_ERROR;                                          \
     }                                                                          \
@@ -170,7 +177,7 @@ static InterpretResult run() {
     }
     printf("\n");
     dissassembleInstruction(&frame->function->chunk,
-                            (int)(frame->ip - frame->function->chunk.code));
+                            (int)(ip - frame->function->chunk.code));
 #endif
     uint8_t instruction;
     switch (instruction = READ_BYTE()) {
@@ -200,6 +207,7 @@ static InterpretResult run() {
       ObjString *name = READ_STRING();
       Value value;
       if (!tableGet(&vm.globals, name, &value)) {
+        frame->ip = ip;
         runtimeError("Undefined variable '%s'.", name->chars);
         return INTERPRET_RUNTIME_ERROR;
       }
@@ -221,6 +229,7 @@ static InterpretResult run() {
       ObjString *name = READ_STRING();
       if (tableSet(&vm.globals, name, peek(0))) {
         tableDelete(&vm.globals, name);
+        frame->ip = ip;
         runtimeError("Undefined variable '%s'.", name->chars);
         return INTERPRET_RUNTIME_ERROR;
       }
@@ -252,6 +261,7 @@ static InterpretResult run() {
         double a = AS_NUMBER(pop());
         push(NUMBER_VAL(a + b));
       } else {
+        frame->ip = ip;
         runtimeError("Operands must be two numbers or two strings.");
         return INTERPRET_RUNTIME_ERROR;
       }
@@ -271,6 +281,7 @@ static InterpretResult run() {
     }
     case OP_NEGATE: {
       if (!IS_NUMBER(peek(0))) {
+        frame->ip = ip;
         runtimeError("Operand must be a number");
         return INTERPRET_RUNTIME_ERROR;
       }
@@ -284,27 +295,33 @@ static InterpretResult run() {
     }
     case OP_JUMP: {
       uint16_t offset = READ_SHORT();
-      frame->ip += offset;
+      ip += offset;
       break;
     }
     case OP_JUMP_IF_FALSE: {
       uint16_t offset = READ_SHORT();
       if (isFalsey(peek(0))) {
-        frame->ip += offset;
+        ip += offset;
       }
       break;
     }
     case OP_LOOP: {
       uint16_t offset = READ_SHORT();
-      frame->ip -= offset;
+      ip -= offset;
       break;
     }
     case OP_CALL: {
       int argCount = READ_BYTE();
-      if (!callValue(peek(argCount), argCount)) {
+      frame->ip = ip;
+      Value callee = peek(argCount);
+      bool isFunction = IS_FUNCTION(callee);
+      if (!callValue(callee, argCount)) {
         return INTERPRET_RUNTIME_ERROR;
       }
       frame = &vm.frames[vm.frameCount - 1];
+      if (isFunction) {
+        ip = frame->function->chunk.code;
+      }
       break;
     }
     case OP_RETURN: {
@@ -317,6 +334,7 @@ static InterpretResult run() {
       vm.stackTop = frame->slots;
       push(result);
       frame = &vm.frames[vm.frameCount - 1];
+      ip = frame->ip;
       break;
     }
     }
@@ -333,6 +351,102 @@ InterpretResult interpret(const char *source) {
   if (function == NULL)
     return INTERPRET_COMPILE_ERROR;
   push(OBJ_VAL(function));
+  CallFrame *frame = &vm.frames[vm.frameCount];
   call(function, 0);
+  frame->ip = function->chunk.code;
   return run();
 }
+```
+
+I choose this fib function for the benchmarks:
+
+```lox
+fun fib(n){
+    if(n < 2) return 1;
+    return fib(n - 1) + fib(n - 2);
+  }
+
+var start = clock();
+print fib(20);
+print clock() - start;
+```
+
+
+
+Without the optimization it takes  3.77343 seconds on my machine.
+
+With the opitmization it takes 3.74629 on my machine.
+
+So the optimization does not seems to worth it (the code is quite messy)
+
+## 2
+
+Native function calls are fast in part because we don’t validate that the call passes as many arguments as the function expects. We really should, or an incorrect call to a native function without enough arguments could cause the function to read uninitialized memory. Add arity checking.
+
+I kept it dead simple.
+
+In object.h
+
+```c
+
+#define AS_NATIVE(value) ((ObjNative *)AS_OBJ(value))
+
+typedef struct {
+  Obj obj;
+  NativeFn function;
+  int arity;
+} ObjNative;
+
+
+ObjNative *newNative(NativeFn function, int arity);
+
+```
+
+
+In object.c
+
+```c
+ObjNative *newNative(NativeFn function, int arity) {
+  ObjNative *native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
+  native->function = function;
+  native->arity = arity;
+  return native;
+}
+
+```
+
+In vm.c
+
+```c
+static void defineNative(const char *name, NativeFn function, int arity) {
+  push(OBJ_VAL(copyString(name, (int)strlen(name))));
+  push(OBJ_VAL(newNative(function, arity)));
+  tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
+  pop();
+  pop();
+}
+// in initVM
+  defineNative("clock", clockNative, 0);
+
+// in callValue
+case OBJ_NATIVE: {
+      ObjNative *nativeFn = AS_NATIVE(callee);
+      NativeFn native = nativeFn->function;
+      if (nativeFn->arity != argCount) {
+        runtimeError("Expected %d arguments but got %d.", nativeFn->arity,
+                     argCount);
+        return false;
+      }
+      Value result = native(argCount, vm.stackTop - argCount);
+      vm.stackTop -= argCount + 1;
+      push(result);
+      return true;
+    }
+
+```
+
+## 3
+Right now, there’s no way for a native function to signal a runtime error. In a real implementation, this is something we’d need to support because native functions live in the statically typed world of C but are called from dynamically typed Lox land. If a user, say, tries to pass a string to sqrt(), that native function needs to report a runtime error.
+
+Extend the native function system to support that. How does this capability affect the performance of native calls?
+
