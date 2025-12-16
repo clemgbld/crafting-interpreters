@@ -6,8 +6,10 @@
 #include "object.h"
 #include "table.h"
 #include "value.h"
+#include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -17,6 +19,39 @@ static Value clockNative(int argCount, Value *args) {
   (void)argCount;
   (void)args;
   return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+}
+
+static Value sqrtNative(int argCount, Value *args) {
+  (void)argCount;
+  return NUMBER_VAL(sqrt(AS_NUMBER(*args)));
+}
+
+static Value readFileNative(int argCount, Value *args) {
+  (void)argCount;
+  char *path = AS_CSTRING(*args);
+  FILE *file = fopen(path, "rb");
+  if (file == NULL) {
+    fprintf(stderr, "Could not open file \"%s\".\n", path);
+    return NIL_VAL;
+  }
+  fseek(file, 0L, SEEK_END);
+  size_t fileSize = ftell(file);
+  rewind(file);
+  char *buffer = (char *)malloc(fileSize + 1);
+  if (buffer == NULL) {
+    fprintf(stderr, "Not enough memory to read the file \"%s\".\n", path);
+    return NIL_VAL;
+  }
+  size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
+  if (bytesRead < fileSize) {
+    fprintf(stderr, "Could not open file \"%s\".\n", path);
+    return NIL_VAL;
+  }
+  buffer[bytesRead] = '\0';
+  fclose(file);
+  ObjString *result = copyString(buffer, fileSize);
+  FREE(char, buffer);
+  return OBJ_VAL(result);
 }
 
 static void resetStack() {
@@ -44,9 +79,10 @@ static void runtimeError(const char *format, ...) {
   resetStack();
 }
 
-static void defineNative(const char *name, NativeFn function, int arity) {
+static void defineNative(const char *name, NativeFn function, int arity,
+                         ArgumentType argumentTypes[]) {
   push(OBJ_VAL(copyString(name, (int)strlen(name))));
-  push(OBJ_VAL(newNative(function, arity)));
+  push(OBJ_VAL(newNative(function, arity, argumentTypes)));
   tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
   pop();
   pop();
@@ -73,6 +109,30 @@ static bool call(ObjFunction *function, int argCount) {
   return true;
 }
 
+static const char *objTypeToString(ObjType type) {
+  switch (type) {
+  case OBJ_FUNCTION:
+    return "function";
+  case OBJ_NATIVE:
+    return "function";
+  case OBJ_STRING:
+    return "string";
+  }
+}
+
+static const char *typeToString(ValueType valuetype, ObjType objType) {
+  switch (valuetype) {
+  case VAL_BOOL:
+    return "boolean";
+  case VAL_NUMBER:
+    return "number";
+  case VAL_NIL:
+    return "nil";
+  case VAL_OBJ:
+    return objTypeToString(objType);
+  }
+}
+
 static bool callValue(Value callee, int argCount) {
   if (IS_OBJ(callee)) {
     switch (OBJ_TYPE(callee)) {
@@ -86,6 +146,28 @@ static bool callValue(Value callee, int argCount) {
                      argCount);
         return false;
       }
+      Value *args = vm.stackTop - argCount;
+      for (int i = 0; i < argCount; i++) {
+        ValueType valueType = nativeFn->argumentTypes[i].valueType;
+        if (!IS_VALUE_TYPE(args[i], valueType)) {
+          runtimeError("wrong agrument type for argument %d expected %s got %s",
+                       i + 1,
+                       // dummy OBJ_STRING
+                       typeToString(valueType, OBJ_STRING),
+                       typeToString(args[i].type, OBJ_STRING));
+          return false;
+        }
+
+        ObjType objType = nativeFn->argumentTypes[i].objType;
+        if (IS_OBJ(args[i]) && !IS_OBJ_TYPE(args[i], objType)) {
+          runtimeError("wrong agrument type for argument %d expected %s got %s",
+                       i + 1, typeToString(valueType, objType),
+                       typeToString(args[i].type, AS_OBJ(args[i])->type));
+
+          return false;
+        }
+      }
+
       Value result = native(argCount, vm.stackTop - argCount);
       vm.stackTop -= argCount + 1;
       push(result);
@@ -132,7 +214,12 @@ void initVM() {
   vm.objects = NULL;
   initTable(&vm.strings);
   initTable(&vm.globals);
-  defineNative("clock", clockNative, 0);
+  defineNative("clock", clockNative, 0, (ArgumentType[]){});
+  // OBJ_STRING put as dummy
+  defineNative("sqrt", sqrtNative, 1,
+               (ArgumentType[]){{VAL_NUMBER, OBJ_STRING}});
+  defineNative("readFile", readFileNative, 1,
+               (ArgumentType[]){{VAL_OBJ, OBJ_STRING}});
 };
 
 void freeVM() {

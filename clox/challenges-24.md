@@ -450,3 +450,205 @@ Right now, there’s no way for a native function to signal a runtime error. In 
 
 Extend the native function system to support that. How does this capability affect the performance of native calls?
 
+I kept it simple and used a hacky solution.
+
+In value.h
+
+```c
+
+#define IS_VALUE_TYPE(value, expectedType) ((value).type == (expectedType))
+```
+
+In object.h
+
+```c
+
+#define IS_OBJ_TYPE(value, expectedType) isObjTypeLoose(value, (expectedType))
+
+typedef struct {
+  ValueType valueType;
+  ObjType objType;
+} ArgumentType;
+
+#define ARGUMENT_TYPE_MAX 1
+
+typedef struct {
+  Obj obj;
+  NativeFn function;
+  int arity;
+  ArgumentType argumentTypes[ARGUMENT_TYPE_MAX];
+} ObjNative;
+
+static inline bool isObjTypeLoose(Value value, ObjType type) {
+  return isObjType(value, type) ||
+         (IS_OBJ(value) &&
+          ((AS_OBJ(value)->type == OBJ_FUNCTION && type == OBJ_NATIVE) ||
+           (AS_OBJ(value)->type == OBJ_NATIVE && type == OBJ_FUNCTION)));
+}
+```
+
+In object.c
+
+```c
+ObjNative *newNative(NativeFn function, int arity,
+                     ArgumentType argumentTypes[]) {
+  ObjNative *native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
+  native->function = function;
+  native->arity = arity;
+  for (int i = 0; i < native->arity; i++) {
+    native->argumentTypes[i] = argumentTypes[i];
+  }
+  return native;
+}
+```
+
+Where most of the work happen.
+In vm.c
+
+```c
+static void defineNative(const char *name, NativeFn function, int arity,
+                         ArgumentType argumentTypes[]) {
+  push(OBJ_VAL(copyString(name, (int)strlen(name))));
+  push(OBJ_VAL(newNative(function, arity, argumentTypes)));
+  tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
+  pop();
+  pop();
+}
+
+static const char *objTypeToString(ObjType type) {
+  switch (type) {
+  case OBJ_FUNCTION:
+    return "function";
+  case OBJ_NATIVE:
+    return "function";
+  case OBJ_STRING:
+    return "string";
+  }
+}
+
+static const char *typeToString(ValueType valuetype, ObjType objType) {
+  switch (valuetype) {
+  case VAL_BOOL:
+    return "boolean";
+  case VAL_NUMBER:
+    return "number";
+  case VAL_NIL:
+    return "nil";
+  case VAL_OBJ:
+    return objTypeToString(objType);
+  }
+}
+
+static bool callValue(Value callee, int argCount) {
+  if (IS_OBJ(callee)) {
+    switch (OBJ_TYPE(callee)) {
+    case OBJ_FUNCTION:
+      return call(AS_FUNCTION(callee), argCount);
+    case OBJ_NATIVE: {
+      ObjNative *nativeFn = AS_NATIVE(callee);
+      NativeFn native = nativeFn->function;
+      if (nativeFn->arity != argCount) {
+        runtimeError("Expected %d arguments but got %d.", nativeFn->arity,
+                     argCount);
+        return false;
+      }
+      Value *args = vm.stackTop - argCount;
+      for (int i = 0; i < argCount; i++) {
+        ValueType valueType = nativeFn->argumentTypes[i].valueType;
+        if (!IS_VALUE_TYPE(args[i], valueType)) {
+          runtimeError("wrong agrument type for argument %d expected %s got %s",
+                       i + 1,
+                       // dummy OBJ_STRING
+                       typeToString(valueType, OBJ_STRING),
+                       typeToString(args[i].type, OBJ_STRING));
+          return false;
+        }
+
+        ObjType objType = nativeFn->argumentTypes[i].objType;
+        if (IS_OBJ(args[i]) && !IS_OBJ_TYPE(args[i], objType)) {
+          runtimeError("wrong agrument type for argument %d expected %s got %s",
+                       i + 1, typeToString(valueType, objType),
+                       typeToString(args[i].type, AS_OBJ(args[i])->type));
+
+          return false;
+        }
+      }
+
+      Value result = native(argCount, vm.stackTop - argCount);
+      vm.stackTop -= argCount + 1;
+      push(result);
+      return true;
+    }
+
+    default:
+      break;
+    }
+  }
+  runtimeError("Can only call functinos and classes");
+  return false;
+}
+
+void initVM() {
+  resetStack();
+  vm.objects = NULL;
+  initTable(&vm.strings);
+  initTable(&vm.globals);
+  defineNative("clock", clockNative, 0, (ArgumentType[]){});
+  // OBJ_STRING put as dummy
+  defineNative("sqrt", sqrtNative, 1,
+               (ArgumentType[]){{VAL_NUMBER, OBJ_STRING}});
+  defineNative("readFile", readFileNative, 1,
+               (ArgumentType[]){{VAL_OBJ, OBJ_STRING}});
+};
+```
+
+This affects the performance at runtime because now before calling any native function we had the check for the arguments that which is O(n) where n is native function arity.
+
+And it also affects the memory used because each ObjNative must now carry an array of struct of that contains the ValueType and the ObjType.
+the array hajs a max of the native function with the max arguments which is 1 for now. so for each enum we add (number of arguments of the native function with which has the most arguments * (sizeOf(ValueType) + sizeOf(ObjType))).
+
+In order to be less hacky i could have introduce an object type "OBJ_NONE" or something like that.
+I studied afterwards how Lua does it and all the functions have they own type checking, the error checking is not centralized like mine so you have a bit more work to do each time you declare your native function but you save memory compared to my solution so it is probably the best of both world.
+
+## 4
+
+Add some more native functions to do things you find useful. Write some programs using those. What did you add? How do they affect the feel of the language and how practical it is?
+
+I added some native functions in order to test my implementation of the third challenge.
+
+```c
+static Value sqrtNative(int argCount, Value *args) {
+  (void)argCount;
+  return NUMBER_VAL(sqrt(AS_NUMBER(*args)));
+}
+
+static Value readFileNative(int argCount, Value *args) {
+  (void)argCount;
+  char *path = AS_CSTRING(*args);
+  FILE *file = fopen(path, "rb");
+  if (file == NULL) {
+    fprintf(stderr, "Could not open file \"%s\".\n", path);
+    return NIL_VAL;
+  }
+  fseek(file, 0L, SEEK_END);
+  size_t fileSize = ftell(file);
+  rewind(file);
+  char *buffer = (char *)malloc(fileSize + 1);
+  if (buffer == NULL) {
+    fprintf(stderr, "Not enough memory to read the file \"%s\".\n", path);
+    return NIL_VAL;
+  }
+  size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
+  if (bytesRead < fileSize) {
+    fprintf(stderr, "Could not open file \"%s\".\n", path);
+    return NIL_VAL;
+  }
+  buffer[bytesRead] = '\0';
+  fclose(file);
+  ObjString *result = copyString(buffer, fileSize);
+  FREE(char, buffer);
+  return OBJ_VAL(result);
+}
+```
+
+It's pretty nice you can build good abstraction for example the readFileNative expose you a clean API to read a file without caring about the details of opening the file, figure out the size, closing the file and so on.

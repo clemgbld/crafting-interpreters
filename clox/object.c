@@ -27,10 +27,14 @@ ObjFunction *newFunction() {
   return function;
 }
 
-ObjNative *newNative(NativeFn function, int arity) {
+ObjNative *newNative(NativeFn function, int arity,
+                     ArgumentType argumentTypes[]) {
   ObjNative *native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
   native->function = function;
   native->arity = arity;
+  for (int i = 0; i < native->arity; i++) {
+    native->argumentTypes[i] = argumentTypes[i];
+  }
   return native;
 }
 
