@@ -91,7 +91,7 @@ static bool callValue(Value callee, int argCount) {
       break;
     }
   }
-  runtimeError("Can only call functinos and classes");
+  runtimeError("Can only call functions and classes");
   return false;
 }
 
