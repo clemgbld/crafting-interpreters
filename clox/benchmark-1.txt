@@ -1,0 +1,47 @@
+var start = clock();
+
+fun level1() {
+  var x = "level 1";
+  fun level2() {
+    var y = "level 2";
+    fun level3() {
+      var z = "level 3";
+      fun level4() {
+        var a = "level 4";
+        fun level5() {
+          var b = "level 5";
+          fun level6() {
+            var c = "level 6";
+            fun level7() {
+              var d = "level 7";
+              fun level8() {
+                print x;
+                print y;
+                print z;
+                print a;
+                print b;
+                print c;
+                print d;
+              }
+              return level8;
+            }
+            return level7;
+          }
+          return level6;
+        }
+        return level5;
+      }
+      return level4;
+    }
+    return level3;
+  }
+  return level2;
+}
+
+var closure = level1()()()()()()();
+closure();
+
+var end = clock();
+
+print "time:";
+print end - start;

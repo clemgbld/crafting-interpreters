@@ -1,0 +1,57 @@
+var start = clock();
+
+fun one(){
+    print 1;
+}
+
+fun two(){
+    print 2;
+}
+
+fun three(){
+    print 3;
+}
+
+fun four(){
+    print 4;
+}
+
+fun five(){
+    print 5;
+}
+
+fun six(){
+    print 6;
+}
+
+fun seven(){
+    print 7;
+}
+
+fun eight(){
+    print 8;
+}
+
+fun nine(){
+    print 9;
+}
+
+fun ten(){
+    print 10;
+}
+
+one();
+two();
+three();
+four();
+five();
+six();
+seven();
+eight();
+nine();
+ten();
+
+var end = clock();
+
+print "time:";
+print end - start;

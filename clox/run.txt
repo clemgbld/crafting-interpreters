@@ -1,11 +1,39 @@
-fun outer() {
-  var x = "outside";
-  fun inner() {
-    print x;
+fun makeVector(x,y){
+
+    fun getX(){
+        return x;
+      }
+
+    fun getY(){
+        return y;
+      }
+
+    fun add(vector){
+        return makeVector(x + vector("getX")(), y + vector("getY")());
+      }
+
+    fun methods(method){
+      if(method == "getX"){
+          return getX; 
+        }
+
+      if(method == "getY"){
+          return getY; 
+        }
+
+      if(method == "add"){
+          return add; 
+        }
+      print "wrong method name";
+      }
+    return methods;
   }
 
-  return inner;
-}
+  var vector1 = makeVector(1,2);
 
-var closure = outer();
-closure();
+  var vector2 = makeVector(3,4);
+
+  var vector3 = vector1("add")(vector2);
+
+  print vector3("getX")();
+  print vector3("getY")();
