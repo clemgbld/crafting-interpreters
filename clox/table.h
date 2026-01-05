@@ -28,5 +28,5 @@ bool tableDelete(Table *table, ObjString *key);
 
 ObjString *tableFindString(Table *table, const char *chars, int length,
                            uint32_t hash);
-
+void markTable(Table *table);
 #endif
