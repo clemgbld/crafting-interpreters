@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -129,8 +130,8 @@ static bool isFalsey(Value value) {
 }
 
 static void concatenate() {
-  ObjString *b = AS_STRING(pop());
-  ObjString *a = AS_STRING(pop());
+  ObjString *b = AS_STRING(peek(0));
+  ObjString *a = AS_STRING(peek(1));
 
   int length = a->length + b->length;
   char *chars = ALLOCATE(char, length + 1);
@@ -138,6 +139,8 @@ static void concatenate() {
   memcpy(chars + a->length, b->chars, b->length);
   chars[length] = '\0';
   ObjString *result = takeString(chars, length);
+  pop();
+  pop();
   push(OBJ_VAL(result));
 };
 
@@ -157,12 +160,18 @@ void initVM() {
   initTable(&vm.strings);
   initTable(&vm.globals);
   defineNative("clock", clockNative);
+  vm.grayCapacity = 0;
+  vm.grayCount = 0;
+  vm.grayStack = NULL;
+  vm.bytesAllocated = 0;
+  vm.nextGC = 1024 * 1024;
 };
 
 void freeVM() {
   freeObjects();
   freeTable(&vm.strings);
   freeTable(&vm.globals);
+  free(vm.grayStack);
 };
 
 static InterpretResult run() {

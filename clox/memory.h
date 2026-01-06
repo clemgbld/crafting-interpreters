@@ -4,6 +4,8 @@
 #include "common.h"
 #include "object.h"
 
+#define GC_HEAP_GROW_FACTOR 2
+
 #define ALLOCATE(type, count)                                                  \
   (type *)reallocate(NULL, 0, sizeof(type) * (count))
 
