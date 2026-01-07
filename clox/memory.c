@@ -180,7 +180,7 @@ void markObject(Obj *object) {
 
   object->isMarked = true;
 
-  if (vm.grayCapacity < vm.grayCount) {
+  if (vm.grayCapacity < vm.grayCount + 1) {
     vm.grayCapacity = GROW_CAPACITY(vm.grayCapacity);
     vm.grayStack =
         (Obj **)realloc(vm.grayStack, sizeof(Obj *) * vm.grayCapacity);
