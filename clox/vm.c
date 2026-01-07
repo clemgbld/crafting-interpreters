@@ -157,14 +157,14 @@ Value pop() {
 void initVM() {
   resetStack();
   vm.objects = NULL;
-  initTable(&vm.strings);
-  initTable(&vm.globals);
-  defineNative("clock", clockNative);
   vm.grayCapacity = 0;
   vm.grayCount = 0;
   vm.grayStack = NULL;
   vm.bytesAllocated = 0;
   vm.nextGC = 1024 * 1024;
+  initTable(&vm.strings);
+  initTable(&vm.globals);
+  defineNative("clock", clockNative);
 };
 
 void freeVM() {
