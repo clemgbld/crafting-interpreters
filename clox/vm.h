@@ -26,11 +26,14 @@ typedef struct {
   Table globals;
   ObjUpvalue *openUpvalues;
   Obj *objects;
+  Obj *longLive;
   int grayCapacity;
   int grayCount;
   Obj **grayStack;
   size_t bytesAllocated;
+  size_t bytesAllocatedLongLive;
   size_t nextGC;
+  bool isLongLiveGarbageCollection;
 } VM;
 
 void initVM();

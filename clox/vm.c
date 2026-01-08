@@ -157,11 +157,14 @@ Value pop() {
 void initVM() {
   resetStack();
   vm.objects = NULL;
+  vm.longLive = NULL;
   vm.grayCapacity = 0;
   vm.grayCount = 0;
   vm.grayStack = NULL;
   vm.bytesAllocated = 0;
+  vm.bytesAllocatedLongLive = 0;
   vm.nextGC = 1024 * 1024;
+  vm.isLongLiveGarbageCollection = false;
   initTable(&vm.strings);
   initTable(&vm.globals);
   defineNative("clock", clockNative);

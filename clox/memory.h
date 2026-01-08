@@ -6,6 +6,10 @@
 
 #define GC_HEAP_GROW_FACTOR 2
 
+#define GC_HEAP_LONG_LIVE_MAX_FACTOR 0.75
+
+#define LONG_LIVE_AGE 3
+
 #define ALLOCATE(type, count)                                                  \
   (type *)reallocate(NULL, 0, sizeof(type) * (count))
 

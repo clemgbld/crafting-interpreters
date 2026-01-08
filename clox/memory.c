@@ -106,12 +106,72 @@ static void freeObject(Obj *object) {
   }
 }
 
+size_t getBytesByObj(Obj *object) {
+  switch (object->type) {
+  case OBJ_FUNCTION:
+    return sizeof(ObjFunction);
+  case OBJ_STRING:
+    return sizeof(ObjString);
+  case OBJ_NATIVE:
+    return sizeof(ObjNative);
+  case OBJ_CLOSURE:
+    return sizeof(ObjClosure);
+  case OBJ_UPVALUE:
+    return sizeof(ObjUpvalue);
+
+  default:
+    // Unreachable
+    return 0;
+  }
+}
+
+void promote(Obj *object) {
+  object->age++;
+  object->next = vm.longLive;
+  object->isMarked = false;
+  object->isTraversed = true;
+  vm.longLive = object;
+  vm.bytesAllocatedLongLive += getBytesByObj(object);
+}
+
+static bool shouldPromote(Obj *object) {
+  return object->isMarked && object->age == LONG_LIVE_AGE;
+}
+
 static void sweep() {
   Obj *previous = NULL;
   Obj *object = vm.objects;
   while (object != NULL) {
+    if (shouldPromote(object) || !object->isMarked) {
+      Obj *unreached = object;
+      object = object->next;
+      if (previous != NULL) {
+        previous->next = object;
+      } else {
+        vm.objects = object;
+      }
+      if (shouldPromote(unreached)) {
+        promote(unreached);
+      } else {
+        freeObject(unreached);
+      }
+    } else {
+      object->isMarked = false;
+      object->isTraversed = false;
+      object->age++;
+      previous = object;
+      object = object->next;
+    }
+  }
+}
+
+static void sweepLongLive() {
+  Obj *previous = NULL;
+  Obj *object = vm.longLive;
+  while (object != NULL) {
     if (object->isMarked) {
       object->isMarked = false;
+      object->isTraversed = false;
       previous = object;
       object = object->next;
     } else {
@@ -120,8 +180,10 @@ static void sweep() {
       if (previous != NULL) {
         previous->next = object;
       } else {
-        vm.objects = object;
+        vm.longLive = object;
       }
+
+      vm.bytesAllocatedLongLive -= getBytesByObj(unreached);
       freeObject(unreached);
     }
   }
@@ -129,19 +191,41 @@ static void sweep() {
 
 void collectGarbage() {
 #ifdef DEBUG_LOG_GC
-  printf("-- gc begin\n");
-  size_t before = vm.bytesAllocated;
+  printf("-- gc begin short lived objects\n");
+  size_t before = vm.bytesAllocated - vm.bytesAllocatedLongLive;
 #endif
   markRoots();
   traceReferences();
   tableRemoveWhite(&vm.strings);
   sweep();
-  vm.nextGC = vm.bytesAllocated * GC_HEAP_GROW_FACTOR;
+  vm.nextGC =
+      (vm.bytesAllocated - vm.bytesAllocatedLongLive) * GC_HEAP_GROW_FACTOR;
 
 #ifdef DEBUG_LOG_GC
-  printf("-- gc end\n");
-  printf("  colllected %zu bytes (from %zu to %zu) next at %zu",
-         before - vm.bytesAllocated, before, vm.bytesAllocated, vm.nextGC);
+  printf("-- gc end short lived objects\n");
+  size_t after = vm.bytesAllocated - vm.bytesAllocatedLongLive;
+  printf("  colllected %zu bytes (from %zu to %zu) next at %zu", before - after,
+         before, after, vm.nextGC);
+#endif
+}
+
+void collectLongLiveGarbage() {
+#ifdef DEBUG_LOG_GC
+  printf("-- gc begin long live objects\n");
+  size_t before = vm.bytesAllocatedLongLive;
+#endif
+  vm.isLongLiveGarbageCollection = true;
+  markRoots();
+  traceReferences();
+  tableRemoveWhite(&vm.strings);
+  sweepLongLive();
+  vm.isLongLiveGarbageCollection = false;
+
+#ifdef DEBUG_LOG_GC
+  printf("-- gc end short lived objects\n");
+  size_t after = vm.bytesAllocatedLongLive;
+  printf("  colllected %zu bytes (from %zu to %zu) next at %zu", before - after,
+         before, after, vm.bytesAllocated * GC_HEAP_LONG_LIVE_MAX_FACTOR);
 #endif
 }
 
@@ -151,16 +235,22 @@ void *reallocate(void *pointer, size_t oldSize, size_t newSize) {
 #ifdef DEBUG_STRESS_GC
     collectGarbage();
 #endif
-    if (vm.bytesAllocated > vm.nextGC) {
+#ifdef DEBUG_STRESS_GC
+    collectLongLiveGarbage();
+#endif
+
+    if ((vm.bytesAllocated - vm.bytesAllocatedLongLive) > vm.nextGC) {
       collectGarbage();
+    }
+    if (vm.bytesAllocated > 0 &&
+        ((double)vm.bytesAllocatedLongLive / (double)vm.bytesAllocated) >
+            GC_HEAP_LONG_LIVE_MAX_FACTOR) {
+      collectLongLiveGarbage();
     }
   }
   if (newSize == 0) {
     free(pointer);
     return NULL;
-  }
-
-  if (oldSize) {
   }
 
   void *result = realloc(pointer, newSize);
@@ -170,15 +260,21 @@ void *reallocate(void *pointer, size_t oldSize, size_t newSize) {
 void markObject(Obj *object) {
   if (object == NULL)
     return;
-  if (object->isMarked)
+  if (object->isTraversed)
     return;
+
 #ifdef DEBUG_LOG_GC
   printf("%mark p ", (void *)object);
   printValue(OBJ_VAL(object));
   printf("\n");
 #endif
 
-  object->isMarked = true;
+  if ((vm.isLongLiveGarbageCollection && object->age > LONG_LIVE_AGE) ||
+      !vm.isLongLiveGarbageCollection && object->age <= LONG_LIVE_AGE) {
+    object->isMarked = true;
+  }
+
+  object->isTraversed = true;
 
   if (vm.grayCapacity < vm.grayCount + 1) {
     vm.grayCapacity = GROW_CAPACITY(vm.grayCapacity);
@@ -198,11 +294,16 @@ void markValue(Value value) {
   }
 }
 
-void freeObjects() {
-  Obj *object = vm.objects;
+static void freeObjs(Obj *objects) {
+  Obj *object = objects;
   while (object != NULL) {
     Obj *next = object->next;
     freeObject(object);
     object = next;
   }
+}
+
+void freeObjects() {
+  freeObjs(vm.objects);
+  freeObjs(vm.longLive);
 }

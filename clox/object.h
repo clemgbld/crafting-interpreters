@@ -28,6 +28,8 @@ typedef enum {
 struct Obj {
   ObjType type;
   bool isMarked;
+  bool isTraversed;
+  int age;
   struct Obj *next;
 };
 

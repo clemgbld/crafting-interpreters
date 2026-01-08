@@ -1,6 +1,7 @@
 #include "table.h"
 #include "memory.h"
 #include "value.h"
+#include "vm.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,7 +62,13 @@ void tableRemoveWhite(Table *table) {
   for (int i = 0; i < table->capacity; i++) {
     Entry *entry = &table->entries[i];
     if (entry->key != NULL && !entry->key->obj.isMarked) {
-      tableDelete(table, entry->key);
+      if (!vm.isLongLiveGarbageCollection &&
+          entry->key->obj.age > LONG_LIVE_AGE) {
+        tableDelete(table, entry->key);
+      } else if (vm.isLongLiveGarbageCollection &&
+                 entry->key->obj.age > LONG_LIVE_AGE) {
+        tableDelete(table, entry->key);
+      }
     }
   }
 }
