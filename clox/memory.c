@@ -159,10 +159,6 @@ void *reallocate(void *pointer, size_t oldSize, size_t newSize) {
     free(pointer);
     return NULL;
   }
-
-  if (oldSize) {
-  }
-
   void *result = realloc(pointer, newSize);
   return result;
 }
