@@ -168,3 +168,62 @@ case OP_GET_COMPUTED_PROPERTY: {
       break;
     }
 ```
+
+## 3
+
+Conversely, Lox offers no way to remove a field from an instance. You can set a field’s value to nil, but the entry in the hash table is still there. How do other languages handle this? Choose and implement a strategy for Lox.
+
+i added a hasField function as well for coherence sake it is maybe but much simpler to have this native function that the implicit nil that i implemented in the first challenge.
+
+```c
+static Value hasFieldNative(int argCount, Value *args) {
+  if (argCount != 2) {
+    return BOOL_VAL(false);
+  }
+  if (!IS_INSTANCE(args[0])) {
+    return BOOL_VAL(false);
+  }
+  if (!IS_STRING(args[1])) {
+    return BOOL_VAL(false);
+  }
+
+  ObjInstance *instance = AS_INSTANCE(args[0]);
+  ObjString *fieldName = AS_STRING(args[1]);
+
+  return BOOL_VAL(tableGet(&instance->fields, fieldName, &NIL_VAL));
+}
+
+static Value deleteFieldNative(int argCount, Value *args) {
+  if (argCount != 2) {
+    return NIL_VAL;
+  }
+  if (!IS_INSTANCE(args[0])) {
+    return NIL_VAL;
+  }
+  if (!IS_STRING(args[1])) {
+    return NIL_VAL;
+  }
+
+  ObjString *fieldName = AS_STRING(args[1]);
+  ObjInstance *instance = AS_INSTANCE(args[0]);
+
+  tableDelete(&instance->fields, fieldName);
+
+  return NIL_VAL;
+}
+
+void initVM() {
+  resetStack();
+  vm.objects = NULL;
+  initTable(&vm.strings);
+  initTable(&vm.globals);
+  defineNative("clock", clockNative);
+  defineNative("hasField", hasFieldNative);
+  defineNative("deleteField", deleteFieldNative);
+  vm.grayCapacity = 0;
+  vm.grayCount = 0;
+  vm.grayStack = NULL;
+  vm.bytesAllocated = 0;
+  vm.nextGC = 1024 * 1024;
+};
+```

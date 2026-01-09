@@ -47,6 +47,42 @@ static void runtimeError(const char *format, ...) {
   resetStack();
 }
 
+static Value hasFieldNative(int argCount, Value *args) {
+  if (argCount != 2) {
+    return BOOL_VAL(false);
+  }
+  if (!IS_INSTANCE(args[0])) {
+    return BOOL_VAL(false);
+  }
+  if (!IS_STRING(args[1])) {
+    return BOOL_VAL(false);
+  }
+
+  ObjInstance *instance = AS_INSTANCE(args[0]);
+  ObjString *fieldName = AS_STRING(args[1]);
+
+  return BOOL_VAL(tableGet(&instance->fields, fieldName, &NIL_VAL));
+}
+
+static Value deleteFieldNative(int argCount, Value *args) {
+  if (argCount != 2) {
+    return NIL_VAL;
+  }
+  if (!IS_INSTANCE(args[0])) {
+    return NIL_VAL;
+  }
+  if (!IS_STRING(args[1])) {
+    return NIL_VAL;
+  }
+
+  ObjString *fieldName = AS_STRING(args[1]);
+  ObjInstance *instance = AS_INSTANCE(args[0]);
+
+  tableDelete(&instance->fields, fieldName);
+
+  return NIL_VAL;
+}
+
 static void defineNative(const char *name, NativeFn function) {
   push(OBJ_VAL(copyString(name, (int)strlen(name))));
   push(OBJ_VAL(newNative(function)));
@@ -165,6 +201,8 @@ void initVM() {
   initTable(&vm.strings);
   initTable(&vm.globals);
   defineNative("clock", clockNative);
+  defineNative("hasField", hasFieldNative);
+  defineNative("deleteField", deleteFieldNative);
   vm.grayCapacity = 0;
   vm.grayCount = 0;
   vm.grayStack = NULL;
