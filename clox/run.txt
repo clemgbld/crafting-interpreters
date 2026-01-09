@@ -1,11 +1,7 @@
-fun outer() {
-  var x = "outside";
-  fun inner() {
-    print x;
-  }
+class Pair {}
 
-  return inner;
-}
+var pair = Pair();
+pair.first = 1;
+pair.second = 2;
+print pair.first + pair.second; // 3
 
-var closure = outer();
-closure();
