@@ -227,3 +227,14 @@ void initVM() {
   vm.nextGC = 1024 * 1024;
 };
 ```
+
+## 4
+
+
+Because fields are accessed by name at runtime, working with instance state is slow. It’s technically a constant-time operation—thanks, hash tables—but the constant factors are relatively large. This is a major component of why dynamic languages are slower than statically typed ones.
+
+How do sophisticated implementations of dynamically typed languages cope with and optimize this?
+
+Like the author pointed that the answer lie in the Self paper: "An Efficient Implementation of SELF, a Dynamically-Typed Object-Oriented Language Based on Prototypes*".
+
+Inline caches + speculative JIT which generate better code and optimized multiple branches on the code based on the expected types for example when a method expect and integer and return a boolean (basically a predicate) the compiler can optimize a branch when the input is an integer as expected and let another that is not optimized in the rare case of the input not being an integer.
