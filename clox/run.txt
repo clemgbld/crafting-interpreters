@@ -1,12 +1,20 @@
-class Oops {
-    init(){
-      fun f(){
-          print "not a method";
-        }
-
-        this.field = f;
+class Point{
+    init(x, y){
+        this.x = x;
+        this.y = y;
       }
   }
+ 
 
-  var oops = Oops();
-  oops.field();
+var start = clock();
+
+for(var i = 0; i < 10000; i = i + 1){
+      Point(1,2);
+  }
+
+var end = clock();
+
+print "elapsed: ";
+print end - start;
+print " s";
+
