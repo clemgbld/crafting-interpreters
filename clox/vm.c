@@ -182,8 +182,44 @@ static void closeUpvalues(Value *last) {
 static void defineMethod(ObjString *name) {
   Value method = peek(0);
   ObjClass *klass = AS_CLASS(peek(1));
-  tableSet(&klass->methods, name, method);
+  if (!tableGet(&klass->methods, name, &NIL_VAL)) {
+    tableSet(&klass->methods, name, method);
+  }
+  tableSet(&klass->classMethods, name, method);
   pop();
+}
+
+static bool innerGet(Value *method) {
+  ObjClosure *currentClosure = vm.frames[vm.frameCount - 1].closure;
+  ObjString *name = currentClosure->function->name;
+  ObjClass *currentClass = AS_INSTANCE(peek(0))->klass;
+
+  *method = NIL_VAL;
+
+  if (tableGet(&currentClass->classMethods, name, method)) {
+    if (AS_CLOSURE(*method) == currentClosure) {
+      return false;
+    }
+  }
+
+  Value currentMethod = *method;
+  while (true) {
+    currentClass = currentClass->superclass;
+    if (!tableGet(&currentClass->classMethods, name, &currentMethod)) {
+      continue;
+    }
+    if (AS_CLOSURE(currentMethod) == currentClosure) {
+      break;
+    } else {
+      *method = currentMethod;
+    }
+  }
+
+  if (IS_NIL(*method)) {
+    return false;
+  }
+
+  return true;
 }
 
 static bool isFalsey(Value value) {
@@ -368,13 +404,19 @@ static InterpretResult run() {
       break;
     }
 
-    case OP_GET_SUPER: {
-      ObjString *name = READ_STRING();
-      ObjClass *superclass = AS_CLASS(pop());
-
-      if (!bindMethod(superclass, name)) {
+    case OP_GET_INNER: {
+      Value innerMethod;
+      if (!innerGet(&innerMethod)) {
+        runtimeError(
+            "Can only use inner when the superclass has a subclass "
+            "with the same method name %s.",
+            vm.frames[vm.frameCount - 1].closure->function->name->chars);
         return INTERPRET_RUNTIME_ERROR;
       }
+
+      ObjBoundMethod *bound = newBoundMethod(peek(0), AS_CLOSURE(innerMethod));
+      pop();
+      push(OBJ_VAL(bound));
 
       break;
     }
@@ -469,17 +511,21 @@ static InterpretResult run() {
       frame = &vm.frames[vm.frameCount - 1];
       break;
     }
-    case OP_SUPER_INVOKE: {
-      ObjString *method = READ_STRING();
-      int argCount = READ_BYTE();
-      ObjClass *superclass = AS_CLASS(pop());
-      if (!invokeFromClass(superclass, method, argCount)) {
+    case OP_INNER_INVOKE: {
+      Value innerMethod;
+      if (!innerGet(&innerMethod)) {
+        runtimeError(
+            "Can only use inner when the superclass has a subclass "
+            "with the same method name %s.",
+            vm.frames[vm.frameCount - 1].closure->function->name->chars);
         return INTERPRET_RUNTIME_ERROR;
       }
-
+      int argCount = READ_BYTE();
+      call(AS_CLOSURE(innerMethod), argCount);
       frame = &vm.frames[vm.frameCount - 1];
       break;
     }
+
     case OP_CLOSURE: {
       ObjFunction *function = AS_FUNCTION(READ_CONSTANT());
       ObjClosure *closure = newClosure(function);
@@ -524,6 +570,7 @@ static InterpretResult run() {
       }
       ObjClass *subclass = AS_CLASS(peek(0));
       tableAddAll(&AS_CLASS(superclass)->methods, &subclass->methods);
+      subclass->superclass = AS_CLASS(superclass);
       pop(); // Subclass
       break;
     }

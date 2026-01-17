@@ -50,6 +50,13 @@ static int invokeInstruction(const char *name, Chunk *chunk, int offset) {
   return offset + 3;
 }
 
+static int innerInvokeInstruction(const char *name, Chunk *chunk, int offset) {
+  uint8_t argCount = chunk->code[offset + 1];
+  printf("%-16s (%d args)", name, argCount);
+  printf("'\n");
+  return offset + 2;
+}
+
 int dissassembleInstruction(Chunk *chunk, int offset) {
   printf("%04d", offset);
   if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
@@ -89,8 +96,8 @@ int dissassembleInstruction(Chunk *chunk, int offset) {
     return constantInstruction("OP_GET_PROPERTY", chunk, offset);
   case OP_SET_PROPERTY:
     return constantInstruction("OP_SET_PROPERTY", chunk, offset);
-  case OP_GET_SUPER:
-    return constantInstruction("OP_GET_SUPER", chunk, offset);
+  case OP_GET_INNER:
+    return simpleInstruction("OP_GET_INNER", offset);
   case OP_EQUAL:
     return simpleInstruction("OP_EQUAL", offset);
   case OP_LESS:
@@ -121,8 +128,8 @@ int dissassembleInstruction(Chunk *chunk, int offset) {
     return byteInstruction("OP_CALL", chunk, offset);
   case OP_INVOKE:
     return invokeInstruction("OP_INVOKE", chunk, offset);
-  case OP_SUPER_INVOKE:
-    return invokeInstruction("OP_SUPER_INVOKE", chunk, offset);
+  case OP_INNER_INVOKE:
+    return innerInvokeInstruction("OP_INNER_INVOKE", chunk, offset);
   case OP_CLOSURE: {
     offset++;
     uint8_t constant = chunk->code[offset++];

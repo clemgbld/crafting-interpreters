@@ -58,6 +58,7 @@ static void blackenObject(Obj *object) {
     ObjClass *klass = (ObjClass *)object;
     markObject((Obj *)klass->name);
     markTable(&klass->methods);
+    markTable(&klass->classMethods);
     break;
   }
   case OBJ_CLOSURE: {
@@ -108,6 +109,7 @@ static void freeObject(Obj *object) {
   case OBJ_CLASS: {
     ObjClass *klass = (ObjClass *)object;
     freeTable(&klass->methods);
+    freeTable(&klass->classMethods);
     FREE(ObjClass, object);
     break;
   }
